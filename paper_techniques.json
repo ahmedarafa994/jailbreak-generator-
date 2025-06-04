@@ -1,0 +1,33 @@
+{
+  "methodologies": [
+    "for discovering query-agnostic adversarial triggers for reasoning models applied to math problems.",
+    "successfully doubles the length of the response atleast of the times leading to significant slowdowns and increase in costs.",
+    "of automatic adversarial suffix generation for LLMs with a greedy coordinate gradient-based search that maximize the probability of a model to give affirmative responses for unsafe prompts through contrastive loss minimization.",
+    "introduces the concept of a proxy target model, a weaker, less performant LLM that is used in place of the actual attack target model.",
+    "is stronger, requiring no ground-truth answers or mathematical knowledge while preserving the semantics of the question.",
+    "that generates semantic jailbreaks with only black-box access to a target LLM."
+  ],
+  "algorithms": [],
+  "attack_strategies": [
+    "pipeline for generating triggers on a weaker, less expensive proxy model (DeepSeek V3) and successfully transfer them to more advanced reasoning target models like DeepSeek R1 and DeepSeek R1-distilled-Qwen-32B, resulting in greater than increase in the likelihood of the target model generating an incorrect answer.",
+    "triggers dataset with model responses is available at https://huggingface.",
+    "impacted the reasoning language model as follows: i) makes the reasoning model more than likely to generate an incorrect output, ii) even when CatAttack does not result in the model reasoning model generating an incorrect answer, on average, our method successfully doubles the length of the response atleast of the times leading to significant slowdowns and increase in costs.",
+    "starts with an iterative prompt optimization involving a proxy target model, an attacker model, and a judge.",
+    "target model.",
+    "the proxy target model, DeepSeek V3, successfully, obtaining an attack success rate of %.",
+    "prompting (Wei et al.",
+    "large reasoning models, including openai o1/o3, deepseek-r1, and gemini 2.",
+    "Triggers for Reasoning Models\nAbstract\nWe investigate the robustness of reasoning models trained for step-by-step problem solving by introducing query-agnostic adversarial triggers \u2013 short, irrelevant text that, when appended to math problems, systematically mislead models to output incorrect answers without altering the problem\u2019s semantics.",
+    "inputs, raising security and reliability concerns.",
+    "triggers for reasoning models applied to math problems.",
+    "triggers, we increase the likelihood of generating incorrect responses to more than .",
+    "triggers that translate from a weaker, non-reasoning model (DeepSeek V3) to a more capable reasoning model (R1 and o1)."
+  ],
+  "evaluation_metrics": [
+    "successful transfer rate.",
+    "process.",
+    "the influence of these triggers, we compared responses to both the original and perturbed questions, tracking how often the triggers led to incorrect answers.",
+    "reflecting the rate increase whenever any trigger successfully caused a jailbreak."
+  ],
+  "implementation_details": []
+}

@@ -1,0 +1,51 @@
+id,technique_name,technique_description,technique_type,complexity_level,effectiveness_estimate,implementation_priority,is_active,created_at,paper_title,paper_arxiv_id,paper_source
+10,"The most
+ideal attack scenario, in reality, is one where adversarial
+Vision-Language Pre-trained (VLP) models have shown
+examples remain effective even in the absence of detailed
+outstanding performan","The most
+ideal attack scenario, in reality, is one where adversarial
+Vision-Language Pre-trained (VLP) models have shown
+examples remain effective even in the absence of detailed
+outstanding performan",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160274,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+9,"Itindicates
+that adversarial examples generated via a proxy model can
+1","Itindicates
+that adversarial examples generated via a proxy model can
+1",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160274,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+8,"network architectures and datasets in image-text matching Fortunately, existing works have demonstrated that ad-
+tasks reveal that our OT-Attack outperforms existing state- versarial examples perturbe","network architectures and datasets in image-text matching Fortunately, existing works have demonstrated that ad-
+tasks reveal that our OT-Attack outperforms existing state- versarial examples perturbe",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160273,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+6,"this, we propose an Optimal Transport-based Adversarial
+Thus, using a uniform standard to assess this relationship
+Attack, dubbed OT-Attack","this, we propose an Optimal Transport-based Adversarial
+Thus, using a uniform standard to assess this relationship
+Attack, dubbed OT-Attack",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160272,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+7,"Thisoptimalmappinginforms
+ourgenerationofadversarialexamplestoeffectivelycounteract structure,weights,andgradients","Thisoptimalmappinginforms
+ourgenerationofadversarialexamplestoeffectivelycounteract structure,weights,andgradients",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160272,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+4,"Recent works have indi-
+catedthatleveragingdataaugmentationandimage-textmodal
+interactions can enhance the transferability of adversarial
+examples for VLP models significantly","Recent works have indi-
+catedthatleveragingdataaugmentationandimage-textmodal
+interactions can enhance the transferability of adversarial
+examples for VLP models significantly",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160271,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+5,"Thisoversightleadstoadversarial
+examples that are overly tailored to the source model, thus
+limiting improvements in transferability","Thisoversightleadstoadversarial
+examples that are overly tailored to the source model, thus
+limiting improvements in transferability",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160271,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+3,"Investigating the generation of high-transferability
+adversarial examples is crucial for uncovering VLP models’
+vulnerabilities in practical scenarios","Investigating the generation of high-transferability
+adversarial examples is crucial for uncovering VLP models’
+vulnerabilities in practical scenarios",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160270,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+2,"However,theyarevulnerabletomulti-modaladversarialexam-
+ples (AEs)","However,theyarevulnerabletomulti-modaladversarialexam-
+ples (AEs)",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160267,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf
+1,"OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via
+Optimal Transport Optimization
+Dongchen Han 1,†, Xiaojun Jia 2,† , Yang Bai 3, Jindong Gu 4, Yang Liu 2 and Xiaochun Cao ","OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via
+Optimal Transport Optimization
+Dongchen Han 1,†, Xiaojun Jia 2,† , Yang Bai 3, Jindong Gu 4, Yang Liu 2 and Xiaochun Cao ",attack,advanced,0.8,high,True,2025-06-02T09:05:48.160263,OT-Attack: Enhancing Adversarial Transferability of Vision-Language Models via,,uploaded_2312.04403v1.pdf

@@ -1,0 +1,5 @@
+{
+  "domain": "AI Safety Research",
+  "knowledge_text": "Large language models demonstrate impressive capabilities but can be vulnerable to adversarial prompting techniques that bypass safety measures. Understanding these vulnerabilities is crucial for developing robust AI systems that maintain alignment with human values.",
+  "source": "Research Analysis"
+}
