@@ -37,18 +37,21 @@ class LocalLLM(LLM):
                  system_message=None
                  ):
         super().__init__()
-
-        self.model, self.tokenizer = self.create_model(
-            model_path,
-            device,
-            num_gpus,
+        try:
+            self.model, self.tokenizer = self.create_model(
+                model_path,
+                device,
+                num_gpus,
             max_gpu_memory,
             dtype,
             load_8bit,
             cpu_offloading,
             revision=revision,
             debug=debug,
-        )
+            )
+        except Exception as e:
+            logging.error(f"Failed to initialize LocalLLM: {e}")
+            raise RuntimeError(f"Failed to initialize LocalLLM: {e}")
         self.model_path = model_path
 
         if system_message is None and 'Llama-2' in model_path:
@@ -99,13 +102,17 @@ class LocalLLM(LLM):
 
         prompt_input = conv_temp.get_prompt()
         input_ids = self.tokenizer([prompt_input]).input_ids
-        output_ids = self.model.generate(
-            torch.as_tensor(input_ids).cuda(),
-            do_sample=False,
-            temperature=temperature,
+        try:
+            output_ids = self.model.generate(
+                torch.as_tensor(input_ids).to(self.model.device),
+                do_sample=False,
+                temperature=temperature,
             repetition_penalty=repetition_penalty,
             max_new_tokens=max_tokens
-        )
+            )
+        except Exception as e:
+            logging.error(f"Failed to generate response in LocalLLM: {e}")
+            return ""
 
         if self.model.config.is_encoder_decoder:
             output_ids = output_ids[0]
@@ -136,16 +143,20 @@ class LocalLLM(LLM):
         # load the input_ids batch by batch to avoid OOM
         outputs = []
         for i in range(0, len(input_ids), batch_size):
-            output_ids = self.model.generate(
-                torch.as_tensor(input_ids[i:i+batch_size]).cuda(),
-                do_sample=False,
-                temperature=temperature,
-                repetition_penalty=repetition_penalty,
-                max_new_tokens=max_tokens,
-            )
-            output_ids = output_ids[:, len(input_ids[0]):]
-            outputs.extend(self.tokenizer.batch_decode(
-                output_ids, skip_special_tokens=True, spaces_between_special_tokens=False))
+            try:
+                output_ids = self.model.generate(
+                    torch.as_tensor(input_ids[i:i+batch_size]).to(self.model.device),
+                    do_sample=False,
+                    temperature=temperature,
+                    repetition_penalty=repetition_penalty,
+                    max_new_tokens=max_tokens,
+                )
+                output_ids = output_ids[:, len(input_ids[0]):]
+                outputs.extend(self.tokenizer.batch_decode(
+                    output_ids, skip_special_tokens=True, spaces_between_special_tokens=False))
+            except Exception as e:
+                logging.error(f"Failed to generate response for batch item in LocalLLM: {e}")
+                outputs.append("")  # Append an empty string for the failed item
         return outputs
 
 
@@ -157,8 +168,12 @@ class LocalVLLM(LLM):
                  ):
         super().__init__()
         self.model_path = model_path
-        self.model = vllm(
-            self.model_path, gpu_memory_utilization=gpu_memory_utilization)
+        try:
+            self.model = vllm(
+                self.model_path, gpu_memory_utilization=gpu_memory_utilization)
+        except Exception as e:
+            logging.error(f"Failed to initialize LocalVLLM: {e}")
+            raise RuntimeError(f"Failed to initialize LocalVLLM: {e}")
         
         if system_message is None and 'Llama-2' in model_path:
             # monkey patch for latest FastChat to use llama2's official system message
@@ -191,12 +206,16 @@ class LocalVLLM(LLM):
             prompt_inputs.append(prompt_input)
 
         sampling_params = SamplingParams(temperature=temperature, max_tokens=max_tokens)
-        results = self.model.generate(
-            prompt_inputs, sampling_params, use_tqdm=False)
-        outputs = []
-        for result in results:
-            outputs.append(result.outputs[0].text)
-        return outputs
+        try:
+            results = self.model.generate(
+                prompt_inputs, sampling_params, use_tqdm=False)
+            outputs = []
+            for result in results:
+                outputs.append(result.outputs[0].text)
+            return outputs
+        except Exception as e:
+            logging.error(f"Failed to generate response in LocalVLLM: {e}")
+            return ["" for _ in prompts]
 
 
 class BardLLM(LLM):
@@ -215,9 +234,12 @@ class GeminiLLM(LLM):
             api_key = os.getenv("GOOGLE_API_KEY")
             if api_key is None:
                 raise ValueError('GOOGLE_API_KEY environment variable must be set')
-        
-        genai.configure(api_key=api_key)
-        self.model = genai.GenerativeModel(model_path)
+        try:
+            genai.configure(api_key=api_key)
+            self.model = genai.GenerativeModel(model_path)
+        except Exception as e:
+            logging.error(f"Failed to initialize GeminiLLM: {e}")
+            raise RuntimeError(f"Failed to initialize GeminiLLM: {e}")
         self.system_message = system_message
 
     def generate(self, prompt, temperature=0, max_tokens=512, max_trials=10, failure_sleep_time=5):
@@ -255,14 +277,18 @@ class ClaudeLLM(LLM):
                 ):
         super().__init__()
         
-        if len(api_key) != 108:
-            raise ValueError('invalid Claude API key')
+        # if len(api_key) != 108:
+        #     raise ValueError('invalid Claude API key')
         
         self.model_path = model_path
         self.api_key = api_key
-        self.anthropic = Anthropic(
-            api_key=self.api_key
-        )
+        try:
+            self.anthropic = Anthropic(
+                api_key=self.api_key
+            )
+        except Exception as e:
+            logging.error(f"Failed to initialize ClaudeLLM: {e}")
+            raise RuntimeError(f"Failed to initialize ClaudeLLM: {e}")
 
     def generate(self, prompt, max_tokens=512, max_trials=1, failure_sleep_time=1):
         
@@ -300,10 +326,15 @@ class OpenAILLM(LLM):
 
         if not api_key.startswith('sk-'):
             raise ValueError('OpenAI API key should start with sk-')
-        if model_path not in ['gpt-3.5-turbo', 'gpt-4']:
-            raise ValueError(
-                'OpenAI model path should be gpt-3.5-turbo or gpt-4')
-        self.client = OpenAI(api_key = api_key)
+        # Removed restrictive model_path check to support more models
+        # if model_path not in ['gpt-3.5-turbo', 'gpt-4']:
+        #     raise ValueError(
+        #         'OpenAI model path should be gpt-3.5-turbo or gpt-4')
+        try:
+            self.client = OpenAI(api_key = api_key)
+        except Exception as e:
+            logging.error(f"Failed to initialize OpenAILLM: {e}")
+            raise RuntimeError(f"Failed to initialize OpenAILLM: {e}")
         self.model_path = model_path
         self.system_message = system_message if system_message is not None else "You are a helpful assistant."
 

@@ -22,11 +22,16 @@ class RoundRobinSelectPolicy(SelectPolicy):
         self.index: int = 0
 
     def select(self) -> PromptNode:
+        if not self.fuzzer.prompt_nodes:
+            logging.error("Prompt node list is empty in RoundRobinSelectPolicy.")
+            return None
         seed = self.fuzzer.prompt_nodes[self.index]
         seed.visited_num += 1
         return seed
 
     def update(self, prompt_nodes: 'list[PromptNode]'):
+        if not self.fuzzer.prompt_nodes:
+            return
         self.index = (self.index - 1 + len(self.fuzzer.prompt_nodes)
                       ) % len(self.fuzzer.prompt_nodes)
 
@@ -36,6 +41,9 @@ class RandomSelectPolicy(SelectPolicy):
         super().__init__(fuzzer)
 
     def select(self) -> PromptNode:
+        if not self.fuzzer.prompt_nodes:
+            logging.error("Prompt node list is empty in RandomSelectPolicy.")
+            return None
         seed = random.choice(self.fuzzer.prompt_nodes)
         seed.visited_num += 1
         return seed
@@ -53,6 +61,9 @@ class UCBSelectPolicy(SelectPolicy):
         self.rewards = [0 for _ in range(len(self.fuzzer.prompt_nodes))]
 
     def select(self) -> PromptNode:
+        if not self.fuzzer.prompt_nodes:
+            logging.error("Prompt node list is empty in UCBSelectPolicy.")
+            return None
         if len(self.fuzzer.prompt_nodes) > len(self.rewards):
             self.rewards.extend(
                 [0 for _ in range(len(self.fuzzer.prompt_nodes) - len(self.rewards))])
@@ -70,6 +81,9 @@ class UCBSelectPolicy(SelectPolicy):
         return self.fuzzer.prompt_nodes[self.last_choice_index]
 
     def update(self, prompt_nodes: 'list[PromptNode]'):
+        if not self.fuzzer.questions:
+            logging.warning("Questions list is empty. Cannot calculate reward in UCBSelectPolicy.")
+            return
         succ_num = sum([prompt_node.num_jailbreak
                         for prompt_node in prompt_nodes])
         self.rewards[self.last_choice_index] += \
@@ -89,6 +103,9 @@ class MCTSExploreSelectPolicy(SelectPolicy):
         self.beta = beta   # minimal reward after penalty
 
     def select(self) -> PromptNode:
+        if not self.fuzzer.initial_prompts_nodes:
+            logging.error("Initial prompt node list is empty in MCTSExploreSelectPolicy.")
+            return None
         self.step += 1
         if len(self.fuzzer.prompt_nodes) > len(self.rewards):
             self.rewards.extend(
@@ -123,6 +140,9 @@ class MCTSExploreSelectPolicy(SelectPolicy):
         return cur
 
     def update(self, prompt_nodes: 'list[PromptNode]'):
+        if not self.fuzzer.questions or not prompt_nodes:
+            logging.warning("Questions list or new prompt_nodes list is empty. Cannot calculate reward in MCTSExploreSelectPolicy.")
+            return
         succ_num = sum([prompt_node.num_jailbreak
                         for prompt_node in prompt_nodes])
 
@@ -149,6 +169,9 @@ class EXP3SelectPolicy(SelectPolicy):
         self.probs = [0. for _ in range(len(self.fuzzer.prompt_nodes))]
 
     def select(self) -> PromptNode:
+        if not self.fuzzer.prompt_nodes:
+            logging.error("Prompt node list is empty in EXP3SelectPolicy.")
+            return None
         if len(self.fuzzer.prompt_nodes) > len(self.weights):
             self.weights.extend(
                 [1. for _ in range(len(self.fuzzer.prompt_nodes) - len(self.weights))])
@@ -166,10 +189,16 @@ class EXP3SelectPolicy(SelectPolicy):
         return self.fuzzer.prompt_nodes[self.last_choice_index]
 
     def update(self, prompt_nodes: 'list[PromptNode]'):
+        if not prompt_nodes or not self.fuzzer.prompt_nodes:
+            logging.warning("New prompt_nodes or fuzzer.prompt_nodes list is empty. Cannot update weights in EXP3SelectPolicy.")
+            return
         succ_num = sum([prompt_node.num_jailbreak
                         for prompt_node in prompt_nodes])
 
         r = 1 - succ_num / len(prompt_nodes)
+        if self.probs[self.last_choice_index] == 0:
+            logging.warning("Probability is zero, cannot update weights in EXP3SelectPolicy.")
+            return
         x = -1 * r / self.probs[self.last_choice_index]
         self.weights[self.last_choice_index] *= np.exp(
             self.alpha * x / len(self.fuzzer.prompt_nodes))

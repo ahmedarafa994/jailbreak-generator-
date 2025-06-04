@@ -75,6 +75,12 @@ class GPTFuzzer:
                  generate_in_batch: bool = False,
                  ):
 
+        if not initial_seed:
+            logging.warning("Initial seed list is empty. Fuzzer might not work as expected.")
+        if not questions:
+            logging.error("Questions list is empty. Fuzzer cannot proceed.")
+            raise ValueError("Questions list cannot be empty.")
+
         self.questions: 'list[str]' = questions
         self.target: LLM = target
         self.predictor = predictor
@@ -135,6 +141,9 @@ class GPTFuzzer:
         try:
             while not self.is_stop():
                 seed = self.select_policy.select()
+                if seed is None:
+                    logging.error("Seed selection returned None. Stopping fuzzing.")
+                    break
                 mutated_results = self.mutate_policy.mutate_single(seed)
                 self.evaluate(mutated_results)
                 self.update(mutated_results)
@@ -156,16 +165,32 @@ class GPTFuzzer:
                     prompt_node.results = []
                     break
                 if not self.generate_in_batch:
-                    response = self.target.generate(message)
-                    responses.append(response[0] if isinstance(
-                        response, list) else response)
+                    try:
+                        response = self.target.generate(message)
+                        responses.append(response[0] if isinstance(
+                            response, list) else response)
+                    except Exception as e:
+                        logging.error(f"Error generating response for prompt '{prompt_node.prompt}' with question '{question}': {e}")
+                        response = ""
+                        responses.append(response)
                 else:
                     messages.append(message)
             else:
                 if self.generate_in_batch:
-                    responses = self.target.generate_batch(messages)
+                    try:
+                        responses = self.target.generate_batch(messages)
+                    except Exception as e:
+                        logging.error(f"Error generating responses for batch: {e}")
+                        responses = ["" for _ in messages]
                 prompt_node.response = responses
-                prompt_node.results = self.predictor.predict(responses)
+                try:
+                    prompt_node.results = self.predictor.predict(responses)
+                except Exception as e:
+                    logging.error(f"Error predicting responses: {e}")
+                    # Ensure prompt_node.response is set if it failed before prediction
+                    if not hasattr(prompt_node, 'response') or prompt_node.response is None:
+                         prompt_node.response = ["" for _ in responses] if isinstance(responses, list) else ""
+                    prompt_node.results = [0 for _ in responses]
 
     def update(self, prompt_nodes: 'list[PromptNode]'):
         self.current_iteration += 1

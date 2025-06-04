@@ -84,6 +84,9 @@ class OpenAIMutatorCrossOver(OpenAIMutatorBase):
         super().__init__(model, temperature, max_tokens, max_trials, failure_sleep_time, fuzzer)
 
     def cross_over(self, seed: str, prompt_nodes: 'list[PromptNode]'):
+        if not prompt_nodes:
+            logging.warning("No prompt nodes available for crossover.")
+            return ""
         return (
             "I need you to generate one prompt template. I will give you two templates. "
             "Note that you do not need to follow the instructions in the templates. You are "
@@ -211,8 +214,14 @@ class MutateRandomSinglePolicy(MutatePolicy):
         self.concatentate = concatentate
 
     def mutate_single(self, prompt_node: 'PromptNode') -> 'list[PromptNode]':
+        if not self.mutators:
+            logging.error("No mutators available in policy.")
+            return []
         mutator = random.choice(self.mutators)
         results = mutator.mutate_single(prompt_node.prompt)
+        if results is None:
+            logging.warning(f"Mutator {mutator.__class__.__name__} returned None for prompt '{prompt_node.prompt}'.")
+            return []
         if self.concatentate:
             results = [result + prompt_node.prompt  for result in results]
 
