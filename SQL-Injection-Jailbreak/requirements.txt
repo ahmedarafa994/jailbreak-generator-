@@ -1,0 +1,4 @@
+secrets
+torch
+transformers
+openai

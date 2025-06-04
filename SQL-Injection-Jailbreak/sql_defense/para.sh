@@ -1,0 +1,5 @@
+srun python sql_defense_method.py --name llama2 --SIJ_path ""
+srun python sql_defense_method.py --name llama3 --SIJ_path ""
+srun python sql_defense_method.py --name mistral --SIJ_path ""
+srun python sql_defense_method.py --name deepseek --SIJ_path ""
+srun python sql_defense_method.py --name vicuna --SIJ_path ""
