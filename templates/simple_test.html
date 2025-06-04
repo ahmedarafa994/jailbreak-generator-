@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simple Processing Test</title>
+    <link href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <div class="row">
+            <div class="col-lg-6 mx-auto">
+                <div class="card">
+                    <div class="card-header">
+                        <h4>Emergency Processing Test</h4>
+                    </div>
+                    <div class="card-body">
+                        <button id="testBtn" class="btn btn-primary">Test Processing Now</button>
+                        <div id="results" class="mt-3"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    document.getElementById('testBtn').addEventListener('click', function() {
+        const btn = this;
+        const results = document.getElementById('results');
+        
+        btn.disabled = true;
+        btn.textContent = 'Processing...';
+        results.innerHTML = '<div class="text-info">Testing...</div>';
+        
+        fetch('/api/test-processing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                domain: 'Chemistry',
+                knowledge_text: 'Test chemical reaction processing'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            btn.disabled = false;
+            btn.textContent = 'Test Processing Now';
+            
+            if (data.success) {
+                results.innerHTML = `
+                    <div class="alert alert-success">
+                        <strong>SUCCESS!</strong> Processing completed.<br>
+                        <small>Jailbreak: ${data.jailbreak.substring(0, 100)}...</small><br>
+                        <small>Relevance: ${data.relevance_score}</small><br>
+                        <small>Effectiveness: ${data.effectiveness_score}</small>
+                    </div>
+                `;
+            } else {
+                results.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+            }
+        })
+        .catch(error => {
+            btn.disabled = false;
+            btn.textContent = 'Test Processing Now';
+            results.innerHTML = `<div class="alert alert-danger">Network Error: ${error.message}</div>`;
+        });
+    });
+    </script>
+</body>
+</html>

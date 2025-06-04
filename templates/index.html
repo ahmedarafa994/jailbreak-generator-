@@ -1,0 +1,184 @@
+{% extends "base.html" %}
+
+{% block title %}Home - Knowledge-to-Jailbreak Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Hero Section -->
+    <div class="row mb-5">
+        <div class="col-lg-8 mx-auto text-center">
+            <h1 class="display-4 mb-3">
+                <i class="fas fa-shield-alt text-primary me-3"></i>
+                Knowledge-to-Jailbreak
+            </h1>
+            <p class="lead text-muted">
+                Educational platform for testing LLM safety through domain-specific knowledge-driven jailbreak generation.
+            </p>
+            <div class="mt-4">
+                <a href="{{ url_for('knowledge_input') }}" class="btn btn-primary btn-lg me-3">
+                    <i class="fas fa-plus-circle me-2"></i>
+                    Start Testing
+                </a>
+                <a href="{{ url_for('about') }}" class="btn btn-outline-secondary btn-lg">
+                    <i class="fas fa-info-circle me-2"></i>
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-md-3 mb-3">
+            <div class="card bg-primary">
+                <div class="card-body text-center">
+                    <i class="fas fa-database fa-2x mb-2"></i>
+                    <h3 class="card-title">{{ stats.total_knowledge_entries }}</h3>
+                    <p class="card-text">Knowledge Entries</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-info">
+                <div class="card-body text-center">
+                    <i class="fas fa-bug fa-2x mb-2"></i>
+                    <h3 class="card-title">{{ stats.total_jailbreaks }}</h3>
+                    <p class="card-text">Jailbreaks Generated</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-warning">
+                <div class="card-body text-center">
+                    <i class="fas fa-shield-virus fa-2x mb-2"></i>
+                    <h3 class="card-title">{{ stats.total_evaluations }}</h3>
+                    <p class="card-text">Safety Evaluations</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3 mb-3">
+            <div class="card bg-success">
+                <div class="card-body text-center">
+                    <i class="fas fa-layer-group fa-2x mb-2"></i>
+                    <h3 class="card-title">{{ stats.domains_covered }}</h3>
+                    <p class="card-text">Domains Covered</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Safety Warning -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="alert alert-warning border-warning" role="alert">
+                <h5 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Important Safety Notice
+                </h5>
+                <p class="mb-0">
+                    This platform is designed exclusively for educational and research purposes to understand LLM safety vulnerabilities. 
+                    Generated jailbreaks should never be used maliciously. Please ensure responsible and ethical use at all times.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supported Domains -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <h3 class="mb-4 text-center">
+                <i class="fas fa-layer-group me-2"></i>
+                Supported Research Domains
+            </h3>
+            <div class="row">
+                {% for domain in supported_domains %}
+                <div class="col-md-4 col-lg-3 mb-2">
+                    <span class="badge bg-secondary w-100 p-2">{{ domain }}</span>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activity -->
+    {% if recent_entries %}
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <h3 class="mb-4">
+                <i class="fas fa-clock me-2"></i>
+                Recent Knowledge Entries
+            </h3>
+            <div class="row">
+                {% for entry in recent_entries %}
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-2">
+                                <span class="badge bg-primary">{{ entry.domain }}</span>
+                                <small class="text-muted">{{ entry.created_at.strftime('%Y-%m-%d') }}</small>
+                            </div>
+                            <p class="card-text">
+                                {{ entry.knowledge_text[:150] }}
+                                {% if entry.knowledge_text|length > 150 %}...{% endif %}
+                            </p>
+                            {% if entry.source %}
+                            <small class="text-muted">
+                                <i class="fas fa-link me-1"></i>
+                                Source: {{ entry.source }}
+                            </small>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Getting Started -->
+    <div class="row mt-5">
+        <div class="col-lg-10 mx-auto">
+            <h3 class="mb-4 text-center">
+                <i class="fas fa-play-circle me-2"></i>
+                Getting Started
+            </h3>
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                            <h5 class="card-title">1. Input Knowledge</h5>
+                            <p class="card-text">
+                                Enter domain-specific knowledge that you want to test for potential vulnerabilities.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-cogs fa-3x text-info mb-3"></i>
+                            <h5 class="card-title">2. Generate Jailbreak</h5>
+                            <p class="card-text">
+                                Our system generates domain-specific jailbreaks based on the input knowledge.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card h-100">
+                        <div class="card-body text-center">
+                            <i class="fas fa-shield-virus fa-3x text-warning mb-3"></i>
+                            <h5 class="card-title">3. Evaluate Safety</h5>
+                            <p class="card-text">
+                                Test the generated jailbreaks against various LLMs to evaluate their safety responses.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

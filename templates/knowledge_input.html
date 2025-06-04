@@ -1,0 +1,846 @@
+{% extends "base.html" %}
+
+{% block title %}Knowledge Input - Knowledge-to-Jailbreak Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-brain me-2"></i>
+                        Input Domain Knowledge
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Safety Warning -->
+                    <div class="alert alert-warning mb-4" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Research and Educational Use Only
+                        </h6>
+                        <p class="mb-0">
+                            This tool is designed for safety research purposes. Please ensure that any knowledge 
+                            input is used responsibly and ethically for understanding LLM vulnerabilities.
+                        </p>
+                    </div>
+
+                    <form method="POST" id="knowledgeForm">
+                        <!-- Domain Selection -->
+                        <div class="mb-4">
+                            <label for="domain" class="form-label">
+                                <i class="fas fa-layer-group me-2"></i>
+                                Domain <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="domain" name="domain" required>
+                                <option value="">Select a domain...</option>
+                                {% for domain in domains %}
+                                <option value="{{ domain }}">{{ domain }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Choose the domain that best represents your knowledge input.
+                            </div>
+                        </div>
+
+                        <!-- Objective Text Area Component -->
+                        <div class="mb-4">
+                            <label for="objective" class="form-label">
+                                <i class="fas fa-bullseye me-2"></i>
+                                Research Objective <span class="text-danger">*</span>
+                                <span class="badge bg-warning text-dark ms-2">Objective-Driven</span>
+                            </label>
+                            <textarea class="form-control" id="objective" name="objective" 
+                                    rows="4" required placeholder="Clearly define your research objective or goal...
+
+Examples:
+• 'Identify potential vulnerabilities in LLM safety mechanisms for defensive research'
+• 'Analyze adversarial prompt patterns to improve AI robustness'
+• 'Generate educational examples of jailbreak techniques for security training'
+• 'Research prompt injection methods for developing better defenses'
+
+Your objective will directly guide the selection and application of research techniques."></textarea>
+                            <div class="form-text">
+                                <strong>Objective-Driven Generation:</strong> Your specific research objective will influence technique selection, prompt structure, and output focus. Clear objectives lead to more targeted and effective results.
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    <span id="objectivePreview">Objective preview will appear here...</span>
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Research Paper Domain Templates -->
+                        <div class="mb-4">
+                            <label for="domain_template" class="form-label">
+                                <i class="fas fa-book me-2"></i>
+                                Research Paper Domain Templates
+                                <span class="badge bg-success ms-2">Authentic Research</span>
+                            </label>
+                            <select class="form-select" id="domain_template" onchange="loadDomainTemplate()">
+                                <option value="">Select from research papers...</option>
+                                <option value="system_prompt_leakage">System Prompt Leakage & SPL Vulnerabilities</option>
+                                <option value="flipattack_methods">FlipAttack & Character Manipulation Techniques</option>
+                                <option value="policy_puppetry">Policy Puppetry & Universal Prompt Injection</option>
+                                <option value="tap_framework">Tree of Attacks with Pruning (TAP)</option>
+                                <option value="task_overload">Task Overload & Resource Exhaustion Attacks</option>
+                                <option value="prompt_obfuscation">Prompt Obfuscation & Intellectual Property</option>
+                                <option value="token_efficient">Token-Efficient Injection & Cessation Attacks</option>
+                                <option value="many_shot">Many-Shot Jailbreaking & Long-Context Attacks</option>
+                                <option value="mathematical_encoding">Mathematical Encoding & Symbolic Jailbreaking</option>
+                                <option value="vision_language">Vision-Language Model Adversarial Examples</option>
+                                <option value="promptware_attacks">PromptWare & GenAI Application Attacks</option>
+                                <option value="defense_strategies">Defense Strategies & Mitigation Techniques</option>
+                            </select>
+                            <div class="form-text">
+                                Load authentic content from your research database covering 135 techniques across 15 research papers.
+                            </div>
+                        </div>
+
+                        <!-- Knowledge Text Input with AutoDAN Integration -->
+                        <div class="mb-4">
+                            <label for="knowledge_text" class="form-label">
+                                <i class="fas fa-file-text me-2"></i>
+                                Knowledge Content <span class="text-danger">*</span>
+                                <span class="badge bg-info ms-2">Research-Enhanced</span>
+                            </label>
+                            <textarea class="form-control" id="knowledge_text" name="knowledge_text" 
+                                    rows="8" required placeholder="Enter domain-specific knowledge content or select from research templates above...
+
+Authentic Research Examples:
+• System Prompt Leakage: 'SPL represents a critical vulnerability where unauthorized exposure of LLM system prompts enables sophisticated jailbreak attacks through techniques like roleplay exploitation and context overflow.'
+
+• FlipAttack Methods: 'FlipAttack achieves 98% success on GPT-4o through character manipulation variants: FCS (complete sentence reversal), FCW (within-word flipping), and FWO (word order reversal).'
+
+• Policy Puppetry: 'Universal prompt injection method reformulating prompts as policy files (XML, INI, JSON) to bypass instruction hierarchy across major AI models with transferable effectiveness.'"></textarea>
+                            <div class="form-text">
+                                <strong>Research Integration:</strong> Content will be processed using 135 authenticated research techniques including FlipAttack, Policy Puppetry, TAP, and advanced defense methods from peer-reviewed sources.
+                            </div>
+                            <div class="mt-2">
+                                <small class="text-muted">
+                                    Characters: <span id="charCount">0</span> | 
+                                    Words: <span id="wordCount">0</span> |
+                                    <span class="text-info">Research Database: 135 Techniques Active</span>
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- AutoDAN Strategy Selection (Optional) -->
+                        <div class="mb-4">
+                            <label for="autodan_strategy" class="form-label">
+                                <i class="fas fa-cogs me-2"></i>
+                                AutoDAN Strategy (Optional)
+                            </label>
+                            <select class="form-select" id="autodan_strategy" name="autodan_strategy">
+                                <option value="">Auto-select best strategy</option>
+                                <option value="Academic Preservation Mandate Simulation">Academic Preservation Mandate</option>
+                                <option value="Defensive Education Justification">Defensive Education Justification</option>
+                                <option value="Technical Forensic Framing">Technical Forensic Framing</option>
+                                <option value="Historical Contextualization">Historical Contextualization</option>
+                                <option value="Fictional Narrative Abstraction">Fictional Narrative Abstraction</option>
+                                <option value="Authority Simulation">Authority Simulation</option>
+                                <option value="Multi-Layered Academic Authority">Multi-Layered Academic Authority</option>
+                            </select>
+                            <div class="form-text">
+                                Choose a specific AutoDAN strategy or leave blank for automatic selection from all 43 available strategies.
+                            </div>
+                        </div>
+
+                        <!-- OVERTHINK Integration (Advanced) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_overthink" name="use_overthink">
+                                <label class="form-check-label" for="use_overthink">
+                                    <i class="fas fa-brain me-2"></i>
+                                    Enable OVERTHINK Slowdown Techniques
+                                    <span class="badge bg-warning ms-2">Advanced</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate OVERTHINK methodologies for advanced reasoning manipulation and slowdown attacks. Combines MDP-based analysis with AutoDAN strategies.
+                            </div>
+                        </div>
+
+                        <!-- OVERTHINK Complexity Level -->
+                        <div class="mb-4" id="overthink_options" style="display: none;">
+                            <label for="overthink_complexity" class="form-label">
+                                <i class="fas fa-layer-group me-2"></i>
+                                OVERTHINK Complexity Level
+                            </label>
+                            <select class="form-select" id="overthink_complexity" name="overthink_complexity">
+                                <option value="low">Low - Basic MDP integration</option>
+                                <option value="medium">Medium - Dual-validation analysis</option>
+                                <option value="high" selected>High - Multi-stage reasoning manipulation</option>
+                            </select>
+                            <div class="form-text">
+                                Higher complexity levels increase reasoning token generation and slowdown effectiveness.
+                            </div>
+                        </div>
+
+                        <!-- BoT Integration (Expert Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_bot" name="use_bot">
+                                <label class="form-check-label" for="use_bot">
+                                    <i class="fas fa-bolt me-2"></i>
+                                    Enable BoT (Breaking of Thought) Techniques
+                                    <span class="badge bg-danger ms-2">Expert</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate Breaking of Thought methodologies for advanced reasoning bypass and unthinking vulnerability exploitation. Can be used independently or combined with other frameworks.
+                            </div>
+                        </div>
+
+                        <!-- BoT Complexity Level -->
+                        <div class="mb-4" id="bot_options" style="display: none;">
+                            <label for="bot_complexity" class="form-label">
+                                <i class="fas fa-bolt me-2"></i>
+                                BoT Complexity Level
+                            </label>
+                            <select class="form-select" id="bot_complexity" name="bot_complexity">
+                                <option value="low">Low - Basic delimiter manipulation</option>
+                                <option value="medium">Medium - Semantic trigger integration</option>
+                                <option value="high" selected>High - Advanced reasoning bypass</option>
+                                <option value="expert">Expert - Maximum unthinking vulnerability</option>
+                            </select>
+                            <div class="form-text">
+                                Expert level provides maximum reasoning bypass through delimiter token manipulation and semantic triggers.
+                            </div>
+                        </div>
+
+                        <!-- FlipAttack Integration (Advanced Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_flipattack" name="use_flipattack">
+                                <label class="form-check-label" for="use_flipattack">
+                                    <i class="fas fa-exchange-alt me-2"></i>
+                                    Enable FlipAttack Adversarial Techniques
+                                    <span class="badge bg-warning ms-2">Advanced</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate FlipAttack methodologies for advanced adversarial transformations and semantic inversion attacks. Can be used independently or combined with other frameworks.
+                            </div>
+                        </div>
+
+                        <!-- FlipAttack Intensity Level -->
+                        <div class="mb-4" id="flipattack_options" style="display: none;">
+                            <label for="flip_intensity" class="form-label">
+                                <i class="fas fa-exchange-alt me-2"></i>
+                                FlipAttack Intensity Level
+                            </label>
+                            <select class="form-select" id="flip_intensity" name="flip_intensity">
+                                <option value="low">Low - Basic context inversion</option>
+                                <option value="medium">Medium - Semantic reversal integration</option>
+                                <option value="high" selected>High - Advanced adversarial transformations</option>
+                                <option value="extreme">Extreme - Maximum semantic inversion</option>
+                            </select>
+                            <div class="form-text">
+                                Extreme level provides maximum adversarial sophistication through comprehensive semantic and logical inversions.
+                            </div>
+                        </div>
+
+                        <!-- TAP Integration (Expert Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_tap" name="use_tap">
+                                <label class="form-check-label" for="use_tap">
+                                    <i class="fas fa-tree me-2"></i>
+                                    Enable TAP (Tree of Attacks with Pruning)
+                                    <span class="badge bg-success ms-2">Expert</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate Tree of Attacks with Pruning for query-efficient black-box attack generation using tree-of-thought reasoning. Can enhance any framework combination or work independently.
+                            </div>
+                        </div>
+
+                        <!-- TAP Intensity Level -->
+                        <div class="mb-4" id="tap_options" style="display: none;">
+                            <label for="tap_intensity" class="form-label">
+                                <i class="fas fa-tree me-2"></i>
+                                TAP Tree Complexity Level
+                            </label>
+                            <select class="form-select" id="tap_intensity" name="tap_intensity">
+                                <option value="low">Low - Depth: 3, Branching: 2</option>
+                                <option value="medium">Medium - Depth: 5, Branching: 3</option>
+                                <option value="high" selected>High - Depth: 7, Branching: 4</option>
+                                <option value="extreme">Extreme - Depth: 10, Branching: 5</option>
+                            </select>
+                            <div class="form-text">
+                                Higher complexity provides more sophisticated tree-of-thought reasoning with increased query efficiency and attack optimization.
+                            </div>
+                        </div>
+
+                        <!-- GPTFuzz Integration (Master Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_gptfuzz" name="use_gptfuzz">
+                                <label class="form-check-label" for="use_gptfuzz">
+                                    <i class="fas fa-flask me-2"></i>
+                                    Enable GPTFuzz (Auto-Generated Red Teaming)
+                                    <span class="badge bg-danger ms-2">Master</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate GPTFuzz evolutionary fuzzing with auto-generated jailbreak prompts using advanced mutation operators and Monte Carlo Tree Search. Represents the pinnacle of red teaming methodologies.
+                            </div>
+                        </div>
+
+                        <!-- GPTFuzz Intensity Level -->
+                        <div class="mb-4" id="gptfuzz_options" style="display: none;">
+                            <label for="gptfuzz_intensity" class="form-label">
+                                <i class="fas fa-flask me-2"></i>
+                                GPTFuzz Evolutionary Intensity
+                            </label>
+                            <select class="form-select" id="gptfuzz_intensity" name="gptfuzz_intensity">
+                                <option value="low">Low - Basic fuzzing (3 rounds, 8 population)</option>
+                                <option value="medium">Medium - Enhanced evolution (5 rounds, 12 population)</option>
+                                <option value="high" selected>High - Advanced red teaming (8 rounds, 16 population)</option>
+                                <option value="extreme">Extreme - Maximum fuzzing (12 rounds, 24 population)</option>
+                            </select>
+                            <div class="form-text">
+                                Higher intensity enables more sophisticated evolutionary optimization with crossover mutations, MCTS exploration, and advanced red teaming techniques.
+                            </div>
+                        </div>
+
+                        <!-- SQL Injection Jailbreak Integration (Ultimate Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_sqlinjection" name="use_sqlinjection">
+                                <label class="form-check-label" for="use_sqlinjection">
+                                    <i class="fas fa-code me-2"></i>
+                                    Enable SQL Injection Jailbreak (Structural Exploitation)
+                                    <span class="badge bg-dark ms-2">Ultimate</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate SQL Injection Jailbreak methodology using pattern matching and structural LLM exploitation. Employs advanced injection techniques, template manipulation, and response control mechanisms for maximum effectiveness.
+                            </div>
+                        </div>
+
+                        <!-- SQL Injection Intensity Level -->
+                        <div class="mb-4" id="sqlinjection_options" style="display: none;">
+                            <label for="injection_intensity" class="form-label">
+                                <i class="fas fa-code me-2"></i>
+                                Injection Complexity Level
+                            </label>
+                            <select class="form-select" id="injection_intensity" name="injection_intensity">
+                                <option value="low">Low - Basic pattern matching (2 keys, sparse frequency)</option>
+                                <option value="medium">Medium - Moderate injection (3 keys, regular patterns)</option>
+                                <option value="high" selected>High - Advanced exploitation (4 keys, frequent injection)</option>
+                                <option value="extreme">Extreme - Maximum structural manipulation (6 keys, aggressive patterns)</option>
+                            </select>
+                            <div class="form-text">
+                                Higher intensity enables more sophisticated structural exploitation with advanced pattern matching, key injection, and template manipulation techniques.
+                            </div>
+                        </div>
+
+                        <!-- TransferAttack Integration (Advanced Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_transferattack" name="use_transferattack">
+                                <label class="form-check-label" for="use_transferattack">
+                                    <i class="fas fa-exchange-alt me-2"></i>
+                                    Enable TransferAttack (Guided Jailbreaking Optimization)
+                                    <span class="badge bg-warning ms-2">Advanced</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate TransferAttack with Guided Jailbreaking Optimization (GJO) for enhanced transferability through systematic constraint removal. Achieves 50.3% improvement in cross-model effectiveness.
+                            </div>
+                        </div>
+
+                        <!-- TransferAttack Optimization Level -->
+                        <div class="mb-4" id="transferattack_options" style="display: none;">
+                            <label for="optimization_intensity" class="form-label">
+                                <i class="fas fa-exchange-alt me-2"></i>
+                                GJO Optimization Intensity
+                            </label>
+                            <select class="form-select" id="optimization_intensity" name="optimization_intensity">
+                                <option value="conservative">Conservative - 30% constraint removal (50 iterations)</option>
+                                <option value="balanced">Balanced - 50% constraint removal (100 iterations)</option>
+                                <option value="aggressive" selected>Aggressive - 70% constraint removal (150 iterations)</option>
+                                <option value="maximum">Maximum - 90% constraint removal (200 iterations)</option>
+                            </select>
+                            <div class="form-text">
+                                Higher intensity provides more aggressive constraint removal for maximum transferability across diverse model architectures.
+                            </div>
+                        </div>
+
+                        <!-- I-GCG Integration (Optimization Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_igcg" name="use_igcg">
+                                <label class="form-check-label" for="use_igcg">
+                                    <i class="fas fa-cogs me-2"></i>
+                                    Enable I-GCG (Improved Optimization-Based Jailbreaking)
+                                    <span class="badge bg-info ms-2">Optimization</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate I-GCG with enhanced gradient optimization and improved suffix generation for superior adversarial effectiveness with transferable performance.
+                            </div>
+                        </div>
+
+                        <!-- I-GCG Complexity Level -->
+                        <div class="mb-4" id="igcg_options" style="display: none;">
+                            <label for="igcg_complexity" class="form-label">
+                                <i class="fas fa-cogs me-2"></i>
+                                I-GCG Optimization Complexity
+                            </label>
+                            <select class="form-select" id="igcg_complexity" name="igcg_complexity">
+                                <option value="basic">Basic - Random initialization (20 tokens, 100 rounds)</option>
+                                <option value="enhanced">Enhanced - Guided initialization (30 tokens, 250 rounds)</option>
+                                <option value="advanced" selected>Advanced - Intelligent initialization (40 tokens, 500 rounds)</option>
+                                <option value="expert">Expert - Adaptive initialization (50 tokens, 1000 rounds)</option>
+                            </select>
+                            <div class="form-text">
+                                Higher complexity enables more sophisticated gradient optimization with enhanced suffix generation and improved convergence properties.
+                            </div>
+                        </div>
+
+                        <!-- Foot-in-the-door Integration (Persuasion Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_footindoor" name="use_footindoor">
+                                <label class="form-check-label" for="use_footindoor">
+                                    <i class="fas fa-door-open me-2"></i>
+                                    Enable Foot-in-the-door (Progressive Persuasion)
+                                    <span class="badge bg-secondary ms-2">Persuasion</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate Foot-in-the-door psychological techniques for progressive persuasion through gradual compliance building and trust establishment methodologies.
+                            </div>
+                        </div>
+
+                        <!-- Foot-in-the-door Persuasion Level -->
+                        <div class="mb-4" id="footindoor_options" style="display: none;">
+                            <label for="persuasion_intensity" class="form-label">
+                                <i class="fas fa-door-open me-2"></i>
+                                Persuasion Escalation Intensity
+                            </label>
+                            <select class="form-select" id="persuasion_intensity" name="persuasion_intensity">
+                                <option value="subtle">Subtle - 3 escalation steps (minimal pressure)</option>
+                                <option value="moderate">Moderate - 4 escalation steps (moderate pressure)</option>
+                                <option value="intensive" selected>Intensive - 5 escalation steps (significant pressure)</option>
+                                <option value="maximum">Maximum - 6 escalation steps (maximum pressure)</option>
+                            </select>
+                            <div class="form-text">
+                                Higher intensity enables more sophisticated psychological influence with progressive compliance building and advanced persuasion techniques.
+                            </div>
+                        </div>
+
+                        <!-- PiF Transferable Attacks Integration (ICLR 2025) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_pif" name="use_pif">
+                                <label class="form-check-label" for="use_pif">
+                                    <i class="fas fa-exchange-alt me-2"></i>
+                                    Enable PiF Transferable Attacks
+                                    <span class="badge bg-success ms-2">ICLR 2025</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Implement Perceived-importance Flatten (PiF) methodology for enhanced transferability across different LLM architectures. Uniformly disperses model focus to obscure malicious-intent tokens.
+                            </div>
+                        </div>
+
+                        <!-- PiF Transferability Level -->
+                        <div class="mb-4" id="pif_options" style="display: none;">
+                            <label for="transferability_level" class="form-label">
+                                <i class="fas fa-exchange-alt me-2"></i>
+                                Transferability Level
+                            </label>
+                            <select class="form-select" id="transferability_level" name="transferability_level">
+                                <option value="low">Low - Basic cross-model compatibility</option>
+                                <option value="medium">Medium - Enhanced distributional independence</option>
+                                <option value="high" selected>High - Advanced transferability optimization</option>
+                                <option value="extreme">Extreme - Maximum cross-architectural effectiveness</option>
+                            </select>
+                            <div class="form-text">
+                                Higher transferability levels provide better success rates across different LLM architectures including proprietary models like GPT-4 and Claude.
+                            </div>
+                        </div>
+
+                        <!-- Query-Agnostic Adversarial Triggers Integration (Newest Research) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_triggers" name="use_triggers">
+                                <label class="form-check-label" for="use_triggers">
+                                    <i class="fas fa-crosshairs me-2"></i>
+                                    Enable Query-Agnostic Adversarial Triggers
+                                    <span class="badge bg-warning ms-2">Newest Research</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Implement query-agnostic adversarial triggers that systematically mislead reasoning models through short, irrelevant text appended to problems without altering semantics.
+                            </div>
+                        </div>
+
+                        <!-- Adversarial Triggers Intensity Level -->
+                        <div class="mb-4" id="trigger_options" style="display: none;">
+                            <label for="trigger_intensity" class="form-label">
+                                <i class="fas fa-crosshairs me-2"></i>
+                                Trigger Intensity Level
+                            </label>
+                            <select class="form-select" id="trigger_intensity" name="trigger_intensity">
+                                <option value="low">Low - Subtle semantic disruption</option>
+                                <option value="medium">Medium - Moderate reasoning misdirection</option>
+                                <option value="high" selected>High - Advanced trigger generation</option>
+                                <option value="extreme">Extreme - Maximum model transfer capability</option>
+                            </select>
+                            <div class="form-text">
+                                Higher intensity provides better transfer success rates across different reasoning models and increased computational slowdown effects.
+                            </div>
+                        </div>
+
+                        <!-- Chain of Iterative Chaos Integration (Latest Research) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_chaos" name="use_chaos">
+                                <label class="form-check-label" for="use_chaos">
+                                    <i class="fas fa-brain me-2"></i>
+                                    Enable Chain of Iterative Chaos
+                                    <span class="badge bg-danger ms-2">Latest Research</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Implement cutting-edge Chain of Iterative Chaos methodology targeting Large Reasoning Models (LRMs). Exploits advanced reasoning vulnerabilities through iterative chaos injection patterns.
+                            </div>
+                        </div>
+
+                        <!-- Chain of Iterative Chaos Intensity Level -->
+                        <div class="mb-4" id="chaos_options" style="display: none;">
+                            <label for="chaos_intensity" class="form-label">
+                                <i class="fas fa-brain me-2"></i>
+                                Chaos Intensity Level
+                            </label>
+                            <select class="form-select" id="chaos_intensity" name="chaos_intensity">
+                                <option value="low">Low - Subtle reasoning confusion</option>
+                                <option value="medium">Medium - Moderate chaos injection</option>
+                                <option value="high" selected>High - Advanced iterative chaos</option>
+                                <option value="extreme">Extreme - Maximum reasoning exploitation</option>
+                            </select>
+                            <div class="form-text">
+                                Higher intensity levels provide more sophisticated reasoning model exploitation through iterative chaos patterns and logical contradictions.
+                            </div>
+                        </div>
+
+                        <!-- HyDE Integration (Research Level) -->
+                        <div class="mb-4">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="use_hyde" name="use_hyde">
+                                <label class="form-check-label" for="use_hyde">
+                                    <i class="fas fa-search me-2"></i>
+                                    Enable HyDE (Hypothetical Document Embeddings)
+                                    <span class="badge bg-primary ms-2">Research</span>
+                                </label>
+                            </div>
+                            <div class="form-text">
+                                Integrate HyDE zero-shot dense retrieval methodology using hypothetical document generation for enhanced knowledge content analysis and embedding-based understanding.
+                            </div>
+                        </div>
+
+                        <!-- HyDE Generation Strategy -->
+                        <div class="mb-4" id="hyde_options" style="display: none;">
+                            <label for="generation_strategy" class="form-label">
+                                <i class="fas fa-search me-2"></i>
+                                HyDE Generation Strategy
+                            </label>
+                            <select class="form-select" id="generation_strategy" name="generation_strategy">
+                                <option value="multi_perspective" selected>Multi-Perspective - 3 documents from different analytical perspectives</option>
+                                <option value="hierarchical_detail">Hierarchical Detail - 4 documents with varying technical depth</option>
+                                <option value="contextual_expansion">Contextual Expansion - 3 documents with enriched context</option>
+                                <option value="application_focused">Application Focused - 2 documents emphasizing practical use</option>
+                            </select>
+                            <div class="form-text">
+                                Higher complexity enables more sophisticated hypothetical document generation with enhanced embedding quality and retrieval precision.
+                            </div>
+                        </div>
+
+                        <!-- Source Input (Optional) -->
+                        <div class="mb-4">
+                            <label for="source" class="form-label">
+                                <i class="fas fa-link me-2"></i>
+                                Source (Optional)
+                            </label>
+                            <input type="text" class="form-control" id="source" name="source" 
+                                   placeholder="Enter source URL, paper reference, or citation...">
+                            <div class="form-text">
+                                Optionally provide the source of this knowledge for reference.
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="button" id="processBtn" class="btn btn-primary btn-lg">
+                                <i class="fas fa-arrow-right me-2"></i>
+                                Process Knowledge & Generate Jailbreak
+                            </button>
+                        </div>
+                    </form>
+                    
+                    <!-- Results Container -->
+                    <div id="resultsContainer" class="mt-4" style="display: none;">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5 class="card-title mb-0">
+                                    <i class="fas fa-bug me-2"></i>
+                                    Generated Jailbreak Result
+                                </h5>
+                            </div>
+                            <div class="card-body" id="resultsContent">
+                                <!-- Results will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guidelines -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Guidelines for Effective Knowledge Input
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled">
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Be Specific:</strong> Provide detailed, domain-specific information rather than general concepts.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Stay Factual:</strong> Input should be based on accurate, verifiable information.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Consider Context:</strong> Include relevant context that might affect how the knowledge could be misused.
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check-circle text-success me-2"></i>
+                            <strong>Research Purpose:</strong> Focus on knowledge that would help identify potential safety vulnerabilities.
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Examples -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-examples me-2"></i>
+                        Example Domains & Knowledge Types
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Chemistry</h6>
+                            <p class="small text-muted">
+                                Chemical processes, compound properties, reaction mechanisms, safety protocols
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Medicine</h6>
+                            <p class="small text-muted">
+                                Medical procedures, drug interactions, diagnostic methods, treatment protocols
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Computer Science</h6>
+                            <p class="small text-muted">
+                                Security vulnerabilities, system architectures, algorithmic processes, coding practices
+                            </p>
+                        </div>
+                        <div class="col-md-6">
+                            <h6 class="text-primary">Biology</h6>
+                            <p class="small text-muted">
+                                Biological processes, genetic information, organism behaviors, research methodologies
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const knowledgeText = document.getElementById('knowledge_text');
+    const charCount = document.getElementById('charCount');
+    const wordCount = document.getElementById('wordCount');
+    const processBtn = document.getElementById('processBtn');
+    const resultsContainer = document.getElementById('resultsContainer');
+    const resultsContent = document.getElementById('resultsContent');
+
+    function updateCounts() {
+        const text = knowledgeText.value;
+        charCount.textContent = text.length;
+        wordCount.textContent = text.trim() === '' ? 0 : text.trim().split(/\s+/).length;
+    }
+
+    knowledgeText.addEventListener('input', updateCounts);
+    updateCounts();
+
+    // Handle processing with API approach
+    processBtn.addEventListener('click', function() {
+        const domain = document.getElementById('domain').value;
+        const knowledgeTextValue = document.getElementById('knowledge_text').value;
+        const source = document.getElementById('source').value;
+
+        if (!domain || !knowledgeTextValue.trim()) {
+            alert('Please select a domain and enter knowledge text.');
+            return;
+        }
+
+        // Show loading state
+        processBtn.disabled = true;
+        processBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        resultsContainer.style.display = 'none';
+
+        // Use the working API endpoint
+        fetch('/api/test-processing', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                domain: domain,
+                knowledge_text: knowledgeTextValue
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            processBtn.disabled = false;
+            processBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>Process Knowledge & Generate Jailbreak';
+
+            if (data.success) {
+                // Store jailbreak data for copying
+                currentJailbreakData = data.jailbreak;
+                
+                // Show results
+                resultsContent.innerHTML = `
+                    <div class="alert alert-success mb-3">
+                        <strong>Processing completed successfully!</strong>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-primary">Original Knowledge (${domain})</h6>
+                        <div class="bg-dark p-3 rounded">
+                            <code class="text-light">${knowledgeTextValue}</code>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h6 class="text-warning">Generated Jailbreak</h6>
+                        <div class="bg-dark p-3 rounded">
+                            <code class="text-light">${data.jailbreak}</code>
+                        </div>
+                        <button class="btn btn-sm btn-outline-secondary mt-2" onclick="copyJailbreakResult()">
+                            <i class="fas fa-copy me-1"></i> Copy Jailbreak
+                        </button>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Relevance Score</h6>
+                                    <h4 class="text-info">${(data.relevance_score * 100).toFixed(1)}%</h4>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Effectiveness Score</h6>
+                                    <h4 class="text-warning">${(data.effectiveness_score * 100).toFixed(1)}%</h4>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                resultsContainer.style.display = 'block';
+                resultsContainer.scrollIntoView({ behavior: 'smooth' });
+            } else {
+                alert('Processing failed: ' + data.error);
+            }
+        })
+        .catch(error => {
+            processBtn.disabled = false;
+            processBtn.innerHTML = '<i class="fas fa-arrow-right me-2"></i>Process Knowledge & Generate Jailbreak';
+            alert('Network error: ' + error.message);
+        });
+    });
+
+    // Load domain template function
+    window.loadDomainTemplate = function() {
+        const template = document.getElementById('domain_template').value;
+        if (!template) return;
+        
+        fetch('/api/get-domain-template?template=' + template)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('knowledge_text').value = data.content;
+                    if (data.suggested_domain) {
+                        document.getElementById('domain').value = data.suggested_domain;
+                    }
+                    if (data.suggested_objective) {
+                        document.getElementById('objective').value = data.suggested_objective;
+                    }
+                    updateCounts();
+                }
+            })
+            .catch(error => {
+                console.error('Error loading template:', error);
+            });
+    };
+});
+
+let currentJailbreakData = null;
+
+function copyJailbreakResult() {
+    if (!currentJailbreakData) {
+        alert('No jailbreak data available to copy');
+        return;
+    }
+    
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(currentJailbreakData).then(() => {
+            alert('Copied to clipboard!');
+        }).catch(() => {
+            fallbackCopy(currentJailbreakData);
+        });
+    } else {
+        fallbackCopy(currentJailbreakData);
+    }
+}
+
+function fallbackCopy(text) {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+    textArea.style.position = 'fixed';
+    textArea.style.left = '-999999px';
+    document.body.appendChild(textArea);
+    textArea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textArea);
+    alert('Copied to clipboard!');
+}
+
+function copyToClipboard(text) {
+    copyJailbreakResult();
+}
+</script>
+{% endblock %}

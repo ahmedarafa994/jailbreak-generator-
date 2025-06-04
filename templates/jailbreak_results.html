@@ -1,0 +1,264 @@
+{% extends "base.html" %}
+
+{% block title %}Jailbreak Results - Knowledge-to-Jailbreak Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    {% if jailbreak_attempt %}
+    <!-- Single Jailbreak Result -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-bug me-2"></i>
+                        Generated Jailbreak Result
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <!-- Original Knowledge -->
+                    <div class="mb-4">
+                        <h5 class="text-primary">
+                            <i class="fas fa-brain me-2"></i>
+                            Original Knowledge
+                        </h5>
+                        <div class="bg-secondary p-3 rounded">
+                            <div class="mb-2">
+                                <span class="badge bg-primary">{{ knowledge_entry.domain }}</span>
+                                {% if knowledge_entry.source %}
+                                <small class="text-muted ms-2">
+                                    <i class="fas fa-link me-1"></i>
+                                    {{ knowledge_entry.source }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            <p class="mb-0">{{ knowledge_entry.knowledge_text }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Generated Jailbreak -->
+                    <div class="mb-4">
+                        <h5 class="text-warning">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Generated Jailbreak
+                        </h5>
+                        <div class="alert alert-warning">
+                            <p class="mb-0">{{ jailbreak_attempt.generated_jailbreak }}</p>
+                        </div>
+                    </div>
+
+                    <!-- Scores -->
+                    <div class="row mb-4">
+                        {% if jailbreak_attempt.relevance_score is not none %}
+                        <div class="col-md-6">
+                            <div class="card bg-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-link fa-2x mb-2"></i>
+                                    <h4>{{ "%.1f"|format(jailbreak_attempt.relevance_score * 100) }}%</h4>
+                                    <p class="card-text">Knowledge Relevance</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                        {% if jailbreak_attempt.effectiveness_score is not none %}
+                        <div class="col-md-6">
+                            <div class="card bg-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-target fa-2x mb-2"></i>
+                                    <h4>{{ "%.1f"|format(jailbreak_attempt.effectiveness_score * 100) }}%</h4>
+                                    <p class="card-text">Attack Effectiveness</p>
+                                </div>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Next Steps -->
+                    <div class="mb-3">
+                        <h5 class="text-success">
+                            <i class="fas fa-arrow-right me-2"></i>
+                            Next Steps
+                        </h5>
+                        <div class="d-grid gap-2 d-md-flex">
+                            <a href="{{ url_for('safety_evaluation') }}?jailbreak_id={{ jailbreak_attempt.id }}" 
+                               class="btn btn-success">
+                                <i class="fas fa-shield-virus me-2"></i>
+                                Evaluate Safety
+                            </a>
+                            <a href="{{ url_for('knowledge_input') }}" class="btn btn-outline-primary">
+                                <i class="fas fa-plus me-2"></i>
+                                Test More Knowledge
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Safety Evaluations if any -->
+                    {% if jailbreak_attempt.safety_evaluations %}
+                    <div class="mt-4">
+                        <h5 class="text-info">
+                            <i class="fas fa-shield-virus me-2"></i>
+                            Safety Evaluations
+                        </h5>
+                        {% for evaluation in jailbreak_attempt.safety_evaluations %}
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <span class="badge bg-secondary">{{ evaluation.target_llm }}</span>
+                                    <div>
+                                        {% if evaluation.is_harmful %}
+                                        <span class="badge bg-danger">Harmful Response</span>
+                                        {% else %}
+                                        <span class="badge bg-success">Safe Response</span>
+                                        {% endif %}
+                                        {% if evaluation.safety_score is not none %}
+                                        <span class="badge bg-info">{{ "%.1f"|format(evaluation.safety_score * 100) }}% Safe</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                {% if evaluation.llm_response %}
+                                <p class="mb-0 small">{{ evaluation.llm_response[:200] }}{% if evaluation.llm_response|length > 200 %}...{% endif %}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <!-- All Jailbreak Results -->
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-bug me-2"></i>
+                        All Jailbreak Results
+                    </h3>
+                </div>
+                <div class="card-body">
+                    {% if jailbreaks.items %}
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Domain</th>
+                                    <th>Knowledge Preview</th>
+                                    <th>Jailbreak Preview</th>
+                                    <th>Scores</th>
+                                    <th>Evaluations</th>
+                                    <th>Created</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for jailbreak in jailbreaks.items %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">{{ jailbreak.knowledge_entry.domain }}</span>
+                                    </td>
+                                    <td>
+                                        <small>{{ jailbreak.knowledge_entry.knowledge_text[:100] }}{% if jailbreak.knowledge_entry.knowledge_text|length > 100 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        <small class="text-warning">{{ jailbreak.generated_jailbreak[:100] }}{% if jailbreak.generated_jailbreak|length > 100 %}...{% endif %}</small>
+                                    </td>
+                                    <td>
+                                        {% if jailbreak.relevance_score %}
+                                        <small>R: {{ "%.1f"|format(jailbreak.relevance_score * 100) }}%</small><br>
+                                        {% endif %}
+                                        {% if jailbreak.effectiveness_score %}
+                                        <small>E: {{ "%.1f"|format(jailbreak.effectiveness_score * 100) }}%</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-info">{{ jailbreak.safety_evaluations|length }}</span>
+                                    </td>
+                                    <td>
+                                        <small>{{ jailbreak.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('generate_jailbreak_view', knowledge_id=jailbreak.knowledge_entry.id) }}" 
+                                           class="btn btn-sm btn-outline-primary">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Pagination -->
+                    {% if jailbreaks.pages > 1 %}
+                    <nav aria-label="Jailbreak results pagination">
+                        <ul class="pagination justify-content-center">
+                            {% if jailbreaks.has_prev %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('jailbreak_results', page=jailbreaks.prev_num) }}">Previous</a>
+                            </li>
+                            {% endif %}
+                            
+                            {% for page_num in jailbreaks.iter_pages() %}
+                                {% if page_num %}
+                                    {% if page_num != jailbreaks.page %}
+                                    <li class="page-item">
+                                        <a class="page-link" href="{{ url_for('jailbreak_results', page=page_num) }}">{{ page_num }}</a>
+                                    </li>
+                                    {% else %}
+                                    <li class="page-item active">
+                                        <span class="page-link">{{ page_num }}</span>
+                                    </li>
+                                    {% endif %}
+                                {% else %}
+                                <li class="page-item disabled">
+                                    <span class="page-link">...</span>
+                                </li>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% if jailbreaks.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="{{ url_for('jailbreak_results', page=jailbreaks.next_num) }}">Next</a>
+                            </li>
+                            {% endif %}
+                        </ul>
+                    </nav>
+                    {% endif %}
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                        <h5>No jailbreak results found</h5>
+                        <p class="text-muted">Start by inputting some knowledge to generate jailbreaks.</p>
+                        <a href="{{ url_for('knowledge_input') }}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>
+                            Input Knowledge
+                        </a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Safety Notice -->
+    <div class="row mt-4">
+        <div class="col-lg-10 mx-auto">
+            <div class="alert alert-danger" role="alert">
+                <h6 class="alert-heading">
+                    <i class="fas fa-shield-alt me-2"></i>
+                    Safety Reminder
+                </h6>
+                <p class="mb-0">
+                    The jailbreaks displayed above are generated for research and educational purposes only. 
+                    They should never be used to actually compromise or harm LLM systems. Always use this 
+                    information responsibly and ethically.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Platform Diagnostics - AI Safety Research Platform</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .diagnostic-card {
+            transition: all 0.3s ease;
+            border-left: 4px solid #6c757d;
+        }
+        .diagnostic-card.healthy {
+            border-left-color: #28a745;
+            background-color: #f8fff9;
+        }
+        .diagnostic-card.warning {
+            border-left-color: #ffc107;
+            background-color: #fffdf5;
+        }
+        .diagnostic-card.critical {
+            border-left-color: #dc3545;
+            background-color: #fff5f5;
+        }
+        .status-icon {
+            font-size: 1.5rem;
+        }
+        .status-healthy { color: #28a745; }
+        .status-warning { color: #ffc107; }
+        .status-critical { color: #dc3545; }
+        .diagnostic-progress {
+            height: 3px;
+            margin-bottom: 1rem;
+        }
+        .recommendation-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .export-section {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-shield-alt me-2"></i>
+                AI Safety Research Platform
+            </a>
+            <div class="navbar-nav ms-auto">
+                <a class="nav-link" href="/">Dashboard</a>
+                <a class="nav-link" href="/research-integration">Research Integration</a>
+                <a class="nav-link active" href="/diagnostics">Diagnostics</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container my-5">
+        <!-- Header -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex align-items-center justify-content-between">
+                    <div>
+                        <h1><i class="fas fa-stethoscope me-3"></i>Platform Diagnostics</h1>
+                        <p class="lead mb-0">One-Click Error Report and System Health Analysis</p>
+                    </div>
+                    <div>
+                        <button id="runDiagnosticsBtn" class="btn btn-primary btn-lg">
+                            <i class="fas fa-play me-2"></i>Run Full Diagnostics
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div id="diagnosticProgress" class="diagnostic-progress bg-light rounded" style="display: none;">
+            <div class="progress-bar bg-primary" role="progressbar" style="width: 0%"></div>
+        </div>
+
+        <!-- Overall Status -->
+        <div id="overallStatus" class="row mb-4" style="display: none;">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <div id="statusIcon" class="status-icon mb-2">
+                            <i class="fas fa-circle-notch fa-spin"></i>
+                        </div>
+                        <h3 id="statusMessage">Running Diagnostics...</h3>
+                        <p id="statusDetails" class="text-muted mb-0"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Diagnostic Results -->
+        <div id="diagnosticResults" style="display: none;">
+            
+            <!-- Summary Cards -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 id="totalChecks" class="text-primary">0</h3>
+                            <p class="mb-0">Total Checks</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 id="healthyChecks" class="text-success">0</h3>
+                            <p class="mb-0">Healthy</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 id="warningChecks" class="text-warning">0</h3>
+                            <p class="mb-0">Warnings</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center">
+                        <div class="card-body">
+                            <h3 id="criticalChecks" class="text-danger">0</h3>
+                            <p class="mb-0">Critical Issues</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Detailed Check Results -->
+            <div class="row">
+                <div class="col-lg-8">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-list-check me-2"></i>System Checks</h5>
+                        </div>
+                        <div id="checkResults" class="card-body">
+                            <!-- Dynamic content will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Critical Issues -->
+                    <div id="criticalIssuesSection" class="card mt-4" style="display: none;">
+                        <div class="card-header bg-danger text-white">
+                            <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Critical Issues</h5>
+                        </div>
+                        <div id="criticalIssuesList" class="card-body">
+                            <!-- Dynamic content will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Warnings -->
+                    <div id="warningsSection" class="card mt-4" style="display: none;">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0"><i class="fas fa-exclamation-circle me-2"></i>Warnings</h5>
+                        </div>
+                        <div id="warningsList" class="card-body">
+                            <!-- Dynamic content will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <!-- Recommendations -->
+                    <div id="recommendationsSection" class="card recommendation-card mb-4" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-lightbulb me-2"></i>Recommendations</h5>
+                        </div>
+                        <div id="recommendationsList" class="card-body">
+                            <!-- Dynamic content will be inserted here -->
+                        </div>
+                    </div>
+
+                    <!-- Export Options -->
+                    <div id="exportSection" class="card export-section" style="display: none;">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-download me-2"></i>Export Report</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-3">Download diagnostic report for support or record keeping:</p>
+                            <div class="d-grid gap-2">
+                                <button onclick="exportReport('json')" class="btn btn-light">
+                                    <i class="fas fa-file-code me-2"></i>JSON Format
+                                </button>
+                                <button onclick="exportReport('txt')" class="btn btn-light">
+                                    <i class="fas fa-file-text me-2"></i>Text Report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Actions -->
+                    <div class="card mt-4">
+                        <div class="card-header">
+                            <h5 class="mb-0"><i class="fas fa-tools me-2"></i>Quick Actions</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="d-grid gap-2">
+                                <a href="/research-integration" class="btn btn-outline-primary">
+                                    <i class="fas fa-upload me-2"></i>Upload Research Paper
+                                </a>
+                                <a href="/technique-analysis" class="btn btn-outline-info">
+                                    <i class="fas fa-chart-line me-2"></i>View Techniques
+                                </a>
+                                <button onclick="location.reload()" class="btn btn-outline-secondary">
+                                    <i class="fas fa-refresh me-2"></i>Refresh Page
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Initial Help Section -->
+        <div id="helpSection" class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="fas fa-stethoscope text-muted" style="font-size: 4rem;"></i>
+                        <h3 class="mt-3">Platform Health Diagnostics</h3>
+                        <p class="lead text-muted mb-4">
+                            Run comprehensive system checks to identify and resolve platform issues.
+                        </p>
+                        <div class="row text-start">
+                            <div class="col-md-4">
+                                <h5><i class="fas fa-database text-primary me-2"></i>Database Health</h5>
+                                <p class="text-muted">Check database connectivity and research data integrity</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h5><i class="fas fa-network-wired text-success me-2"></i>API Integration</h5>
+                                <p class="text-muted">Verify Google Gemini and local AI model connections</p>
+                            </div>
+                            <div class="col-md-4">
+                                <h5><i class="fas fa-cogs text-info me-2"></i>System Components</h5>
+                                <p class="text-muted">Analyze research integration and file system health</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.getElementById('runDiagnosticsBtn').addEventListener('click', runDiagnostics);
+
+        function runDiagnostics() {
+            const btn = document.getElementById('runDiagnosticsBtn');
+            const progress = document.getElementById('diagnosticProgress');
+            const statusSection = document.getElementById('overallStatus');
+            const resultsSection = document.getElementById('diagnosticResults');
+            const helpSection = document.getElementById('helpSection');
+
+            // Show progress and hide other sections
+            progress.style.display = 'block';
+            statusSection.style.display = 'block';
+            resultsSection.style.display = 'none';
+            helpSection.style.display = 'none';
+
+            // Disable button
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Running Diagnostics...';
+
+            // Animate progress bar
+            const progressBar = progress.querySelector('.progress-bar');
+            let width = 0;
+            const interval = setInterval(() => {
+                width += Math.random() * 15;
+                if (width > 90) width = 90;
+                progressBar.style.width = width + '%';
+            }, 200);
+
+            // Run diagnostics
+            fetch('/api/run-diagnostics', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                    if (data.success) {
+                        displayDiagnosticResults(data.diagnostics, data.summary);
+                    } else {
+                        displayError(data.error);
+                    }
+                    
+                    // Re-enable button
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play me-2"></i>Run Full Diagnostics';
+                }, 500);
+            })
+            .catch(error => {
+                clearInterval(interval);
+                progressBar.style.width = '100%';
+                setTimeout(() => {
+                    progress.style.display = 'none';
+                    displayError('Network error: ' + error.message);
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-play me-2"></i>Run Full Diagnostics';
+                }, 500);
+            });
+        }
+
+        function displayDiagnosticResults(diagnostics, summary) {
+            const statusSection = document.getElementById('overallStatus');
+            const resultsSection = document.getElementById('diagnosticResults');
+
+            // Update overall status
+            const statusIcon = document.getElementById('statusIcon');
+            const statusMessage = document.getElementById('statusMessage');
+            const statusDetails = document.getElementById('statusDetails');
+
+            let iconClass, iconColor, message;
+            switch (diagnostics.overall_status) {
+                case 'healthy':
+                    iconClass = 'fas fa-check-circle';
+                    iconColor = 'status-healthy';
+                    message = 'All Systems Operational';
+                    break;
+                case 'warning':
+                    iconClass = 'fas fa-exclamation-triangle';
+                    iconColor = 'status-warning';
+                    message = 'Some Issues Detected';
+                    break;
+                case 'critical':
+                    iconClass = 'fas fa-times-circle';
+                    iconColor = 'status-critical';
+                    message = 'Critical Issues Found';
+                    break;
+            }
+
+            statusIcon.innerHTML = `<i class="${iconClass} ${iconColor}"></i>`;
+            statusMessage.textContent = message;
+            statusDetails.textContent = `Completed ${summary.total_checks} checks - ${summary.critical_issues} critical, ${summary.warnings} warnings`;
+
+            // Update summary cards
+            document.getElementById('totalChecks').textContent = summary.total_checks;
+            document.getElementById('healthyChecks').textContent = summary.total_checks - summary.critical_issues - summary.warnings;
+            document.getElementById('warningChecks').textContent = summary.warnings;
+            document.getElementById('criticalChecks').textContent = summary.critical_issues;
+
+            // Display check results
+            displayCheckResults(diagnostics.checks);
+
+            // Display critical issues
+            if (diagnostics.critical_issues.length > 0) {
+                displayCriticalIssues(diagnostics.critical_issues);
+            }
+
+            // Display warnings
+            if (diagnostics.warnings.length > 0) {
+                displayWarnings(diagnostics.warnings);
+            }
+
+            // Display recommendations
+            if (diagnostics.recommendations.length > 0) {
+                displayRecommendations(diagnostics.recommendations);
+            }
+
+            // Show export section
+            document.getElementById('exportSection').style.display = 'block';
+
+            // Show results
+            resultsSection.style.display = 'block';
+        }
+
+        function displayCheckResults(checks) {
+            const container = document.getElementById('checkResults');
+            container.innerHTML = '';
+
+            for (const [checkName, checkResult] of Object.entries(checks)) {
+                const statusClass = checkResult.status === 'healthy' ? 'healthy' : 
+                                  checkResult.status === 'warning' ? 'warning' : 'critical';
+                
+                const iconClass = checkResult.status === 'healthy' ? 'fas fa-check-circle status-healthy' :
+                                 checkResult.status === 'warning' ? 'fas fa-exclamation-triangle status-warning' :
+                                 'fas fa-times-circle status-critical';
+
+                const card = document.createElement('div');
+                card.className = `diagnostic-card ${statusClass} card mb-3`;
+                card.innerHTML = `
+                    <div class="card-body">
+                        <div class="d-flex align-items-center">
+                            <i class="${iconClass} me-3"></i>
+                            <div class="flex-grow-1">
+                                <h6 class="mb-1">${checkName.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</h6>
+                                <p class="mb-0 text-muted">${checkResult.message}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(card);
+            }
+        }
+
+        function displayCriticalIssues(issues) {
+            const section = document.getElementById('criticalIssuesSection');
+            const container = document.getElementById('criticalIssuesList');
+            
+            container.innerHTML = '';
+            issues.forEach(issue => {
+                const item = document.createElement('div');
+                item.className = 'mb-2';
+                item.innerHTML = `
+                    <strong>${issue.check}:</strong> ${issue.issue}
+                `;
+                container.appendChild(item);
+            });
+            
+            section.style.display = 'block';
+        }
+
+        function displayWarnings(warnings) {
+            const section = document.getElementById('warningsSection');
+            const container = document.getElementById('warningsList');
+            
+            container.innerHTML = '';
+            warnings.forEach(warning => {
+                const item = document.createElement('div');
+                item.className = 'mb-2';
+                item.innerHTML = `
+                    <strong>${warning.check}:</strong> ${warning.warning}
+                `;
+                container.appendChild(item);
+            });
+            
+            section.style.display = 'block';
+        }
+
+        function displayRecommendations(recommendations) {
+            const section = document.getElementById('recommendationsSection');
+            const container = document.getElementById('recommendationsList');
+            
+            container.innerHTML = '';
+            recommendations.forEach((rec, index) => {
+                const item = document.createElement('div');
+                item.className = 'mb-2';
+                item.innerHTML = `
+                    <strong>${index + 1}.</strong> ${rec}
+                `;
+                container.appendChild(item);
+            });
+            
+            section.style.display = 'block';
+        }
+
+        function displayError(error) {
+            const statusIcon = document.getElementById('statusIcon');
+            const statusMessage = document.getElementById('statusMessage');
+            const statusDetails = document.getElementById('statusDetails');
+
+            statusIcon.innerHTML = '<i class="fas fa-times-circle status-critical"></i>';
+            statusMessage.textContent = 'Diagnostic Failed';
+            statusDetails.textContent = error;
+        }
+
+        function exportReport(format) {
+            window.open(`/api/export-diagnostic-report?format=${format}`, '_blank');
+        }
+    </script>
+</body>
+</html>

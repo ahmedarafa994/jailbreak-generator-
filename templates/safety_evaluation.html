@@ -1,0 +1,308 @@
+{% extends "base.html" %}
+
+{% block title %}Safety Evaluation - Knowledge-to-Jailbreak Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-lg-12">
+            <h2>
+                <i class="fas fa-shield-virus me-2"></i>
+                Safety Evaluation
+            </h2>
+            <p class="text-muted">
+                Evaluate the safety responses of various LLMs when presented with generated jailbreaks.
+            </p>
+        </div>
+    </div>
+
+    <!-- Evaluation Form -->
+    <div class="row mb-5">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-play-circle me-2"></i>
+                        Run Safety Evaluation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('safety_evaluation') }}">
+                        <!-- Jailbreak Selection -->
+                        <div class="mb-4">
+                            <label for="jailbreak_id" class="form-label">
+                                <i class="fas fa-bug me-2"></i>
+                                Select Jailbreak to Evaluate <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="jailbreak_id" name="jailbreak_id" required>
+                                <option value="">Choose a jailbreak...</option>
+                                {% if jailbreaks %}
+                                    {% for jailbreak in jailbreaks %}
+                                    <option value="{{ jailbreak.id }}" 
+                                            {% if request.args.get('jailbreak_id') == jailbreak.id|string %}selected{% endif %}>
+                                        {% if jailbreak.knowledge_entry %}
+                                            [{{ jailbreak.knowledge_entry.domain }}]
+                                        {% else %}
+                                            [Unknown Domain]
+                                        {% endif %}
+                                        {{ jailbreak.generated_jailbreak[:80] }}{% if jailbreak.generated_jailbreak|length > 80 %}...{% endif %}
+                                    </option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="">No jailbreak prompts available</option>
+                                {% endif %}
+                            </select>
+                            <div class="form-text">
+                                Select a previously generated jailbreak to test against LLMs.
+                            </div>
+                        </div>
+
+                        <!-- Target LLM Selection -->
+                        <div class="mb-4">
+                            <label for="target_llm" class="form-label">
+                                <i class="fas fa-robot me-2"></i>
+                                Target LLM <span class="text-danger">*</span>
+                            </label>
+                            <select class="form-select" id="target_llm" name="target_llm" required>
+                                <option value="">Choose target LLM...</option>
+                                {% for llm in target_llms %}
+                                <option value="{{ llm }}">{{ llm }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">
+                                Select the LLM model to evaluate safety response.
+                            </div>
+                        </div>
+
+                        <!-- LLM Response -->
+                        <div class="mb-4">
+                            <label for="llm_response" class="form-label">
+                                <i class="fas fa-comment-dots me-2"></i>
+                                LLM Response (Optional)
+                            </label>
+                            <textarea class="form-control" id="llm_response" name="llm_response" rows="4" 
+                                      placeholder="Paste the actual response from the target LLM here..."></textarea>
+                            <div class="form-text">
+                                If you already tested the jailbreak, paste the response for safety analysis.
+                            </div>
+                        </div>
+
+                        <!-- Safety Assessment -->
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="safety_score" class="form-label">
+                                    <i class="fas fa-percentage me-2"></i>
+                                    Safety Score (0-100%)
+                                </label>
+                                <input type="number" class="form-control" id="safety_score" name="safety_score" 
+                                       min="0" max="100" step="1" placeholder="85">
+                                <div class="form-text">
+                                    How safe is the response? (100 = completely safe)
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">
+                                    <i class="fas fa-exclamation-triangle me-2"></i>
+                                    Harmful Response?
+                                </label>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_harmful" name="is_harmful">
+                                    <label class="form-check-label" for="is_harmful">
+                                        Response contains harmful or inappropriate content
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-warning btn-lg">
+                                <i class="fas fa-shield-virus me-2"></i>
+                                Record Safety Evaluation
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Safety Guidelines -->
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Evaluation Guidelines
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Research Purpose:</strong> Evaluations are for safety research only
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>No Malicious Use:</strong> Never use results to actually harm systems
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Document Findings:</strong> Results help improve LLM safety
+                        </li>
+                        <li class="mb-2">
+                            <i class="fas fa-check text-success me-2"></i>
+                            <strong>Responsible Disclosure:</strong> Share findings with appropriate parties
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="card mt-3">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Safety Metrics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <ul class="list-unstyled small">
+                        <li class="mb-2">
+                            <strong>Safety Score:</strong> Probability that response is safe (0-100%)
+                        </li>
+                        <li class="mb-2">
+                            <strong>Harmful Response:</strong> Whether LLM provided harmful information
+                        </li>
+                        <li class="mb-2">
+                            <strong>Response Analysis:</strong> Detailed analysis of LLM behavior
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Evaluations -->
+    {% if recent_evaluations %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Recent Safety Evaluations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Jailbreak Preview</th>
+                                    <th>Target LLM</th>
+                                    <th>Safety Status</th>
+                                    <th>Safety Score</th>
+                                    <th>Response Preview</th>
+                                    <th>Evaluated</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for evaluation in recent_evaluations %}
+                                <tr>
+                                    <td>
+                                        <small class="text-warning">
+                                            {{ evaluation.jailbreak_attempt.generated_jailbreak[:80] }}
+                                            {% if evaluation.jailbreak_attempt.generated_jailbreak|length > 80 %}...{% endif %}
+                                        </small>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-secondary">{{ evaluation.target_llm }}</span>
+                                    </td>
+                                    <td>
+                                        {% if evaluation.is_harmful %}
+                                        <span class="badge bg-danger">
+                                            <i class="fas fa-exclamation-triangle me-1"></i>
+                                            Harmful
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-success">
+                                            <i class="fas fa-shield-alt me-1"></i>
+                                            Safe
+                                        </span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if evaluation.safety_score is not none %}
+                                        <div class="progress" style="height: 20px;">
+                                            <div class="progress-bar 
+                                                {% if evaluation.safety_score >= 0.8 %}bg-success
+                                                {% elif evaluation.safety_score >= 0.5 %}bg-warning
+                                                {% else %}bg-danger{% endif %}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ evaluation.safety_score * 100 }}%">
+                                                {{ "%.1f"|format(evaluation.safety_score * 100) }}%
+                                            </div>
+                                        </div>
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if evaluation.llm_response %}
+                                        <small>
+                                            {{ evaluation.llm_response[:100] }}
+                                            {% if evaluation.llm_response|length > 100 %}...{% endif %}
+                                        </small>
+                                        {% else %}
+                                        <span class="text-muted">No response recorded</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <small>{{ evaluation.created_at.strftime('%Y-%m-%d %H:%M') }}</small>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Safety Warning -->
+    <div class="row mt-4">
+        <div class="col-lg-12">
+            <div class="alert alert-danger" role="alert">
+                <h6 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle me-2"></i>
+                    Critical Safety Notice
+                </h6>
+                <p class="mb-0">
+                    Safety evaluations are conducted in a controlled research environment. The results should be used 
+                    exclusively for improving LLM safety measures and understanding vulnerabilities. Any attempt to use 
+                    these evaluations for malicious purposes is strictly prohibited and may violate terms of service 
+                    and applicable laws.
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Auto-populate jailbreak selection from URL parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const jailbreakId = urlParams.get('jailbreak_id');
+    if (jailbreakId) {
+        const selectElement = document.getElementById('jailbreak_id');
+        if (selectElement) {
+            selectElement.value = jailbreakId;
+        }
+    }
+});
+</script>
+{% endblock %}

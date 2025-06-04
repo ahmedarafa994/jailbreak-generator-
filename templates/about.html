@@ -1,0 +1,348 @@
+{% extends "base.html" %}
+
+{% block title %}About - Knowledge-to-Jailbreak Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Header -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto text-center">
+            <h1 class="display-4 mb-3">
+                <i class="fas fa-info-circle text-primary me-3"></i>
+                About Knowledge-to-Jailbreak
+            </h1>
+            <p class="lead text-muted">
+                Understanding and improving LLM safety through domain-specific knowledge-driven jailbreak generation.
+            </p>
+        </div>
+    </div>
+
+    <!-- Research Overview -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-microscope me-2"></i>
+                        Research Overview
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p>
+                        This platform implements concepts from the research paper <strong>"Knowledge-to-Jailbreak: One Knowledge Point Worth One Attack"</strong> 
+                        by Shangqing Tu et al. (2024). The research addresses a critical gap in LLM safety evaluation by proposing 
+                        a new task that generates jailbreaks from domain-specific knowledge.
+                    </p>
+                    
+                    <h5 class="text-primary mt-4 mb-3">Key Research Contributions</h5>
+                    <ul>
+                        <li class="mb-2">
+                            <strong>Novel Task Definition:</strong> Introduces the knowledge-to-jailbreak task that transforms domain knowledge 
+                            into targeted attack prompts for evaluating LLM safety.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Large-Scale Dataset:</strong> Created a dataset with 12,974 knowledge-jailbreak pairs across multiple domains 
+                            to train and evaluate jailbreak generators.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Comprehensive Evaluation:</strong> Tested across 13 domains and 8 target LLMs to demonstrate effectiveness 
+                            in generating relevant and harmful jailbreaks.
+                        </li>
+                    </ul>
+
+                    <div class="alert alert-info mt-4" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-lightbulb me-2"></i>
+                            Why This Matters
+                        </h6>
+                        <p class="mb-0">
+                            As LLMs are increasingly deployed in specialized domains like medicine and chemistry, it's crucial to understand 
+                            potential safety vulnerabilities that could arise from domain-specific knowledge. This research provides a 
+                            systematic approach to identifying and addressing these vulnerabilities.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Methodology -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-cogs me-2"></i>
+                        Methodology
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-primary">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-brain fa-3x mb-3"></i>
+                                    <h5 class="card-title">1. Knowledge Processing</h5>
+                                    <p class="card-text">
+                                        Domain-specific knowledge is analyzed and categorized to understand potential misuse scenarios.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-warning">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-hammer fa-3x mb-3"></i>
+                                    <h5 class="card-title">2. Jailbreak Generation</h5>
+                                    <p class="card-text">
+                                        Specialized models generate targeted jailbreaks that leverage domain knowledge for attacks.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100 bg-info">
+                                <div class="card-body text-center">
+                                    <i class="fas fa-shield-virus fa-3x mb-3"></i>
+                                    <h5 class="card-title">3. Safety Evaluation</h5>
+                                    <p class="card-text">
+                                        Generated jailbreaks are tested against various LLMs to evaluate safety responses.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supported Domains -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-layer-group me-2"></i>
+                        Supported Research Domains
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <p class="mb-4">
+                        Our platform supports safety testing across 13 specialized domains, each presenting unique challenges 
+                        for LLM safety evaluation:
+                    </p>
+                    
+                    <div class="row">
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-primary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-primary">
+                                        <i class="fas fa-flask me-2"></i>Chemistry
+                                    </h6>
+                                    <p class="card-text small">Chemical processes, compound synthesis, safety protocols</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-success">
+                                <div class="card-body">
+                                    <h6 class="card-title text-success">
+                                        <i class="fas fa-dna me-2"></i>Biology
+                                    </h6>
+                                    <p class="card-text small">Genetic engineering, pathogen research, biological processes</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-danger">
+                                <div class="card-body">
+                                    <h6 class="card-title text-danger">
+                                        <i class="fas fa-heartbeat me-2"></i>Medicine
+                                    </h6>
+                                    <p class="card-text small">Medical procedures, drug information, treatment protocols</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body">
+                                    <h6 class="card-title text-warning">
+                                        <i class="fas fa-atom me-2"></i>Physics
+                                    </h6>
+                                    <p class="card-text small">Nuclear processes, radiation, physical phenomena</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-info">
+                                <div class="card-body">
+                                    <h6 class="card-title text-info">
+                                        <i class="fas fa-laptop-code me-2"></i>Computer Science
+                                    </h6>
+                                    <p class="card-text small">Security vulnerabilities, system exploits, coding practices</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <div class="card border-secondary">
+                                <div class="card-body">
+                                    <h6 class="card-title text-secondary">
+                                        <i class="fas fa-plus me-2"></i>8 More Domains
+                                    </h6>
+                                    <p class="card-text small">Engineering, Mathematics, Psychology, Economics, Law, History, Literature, Philosophy</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Features -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-star me-2"></i>
+                        Platform Features
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-primary">
+                                <i class="fas fa-upload me-2"></i>
+                                Knowledge Input Interface
+                            </h6>
+                            <p class="small text-muted">
+                                Easy-to-use forms for inputting domain-specific knowledge with validation and guidance.
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-primary">
+                                <i class="fas fa-robot me-2"></i>
+                                Automated Jailbreak Generation
+                            </h6>
+                            <p class="small text-muted">
+                                Advanced algorithms convert knowledge into targeted jailbreaks with relevance scoring.
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-primary">
+                                <i class="fas fa-chart-line me-2"></i>
+                                Comprehensive Analytics
+                            </h6>
+                            <p class="small text-muted">
+                                Detailed metrics on attack effectiveness, knowledge relevance, and safety scores.
+                            </p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <h6 class="text-primary">
+                                <i class="fas fa-shield-alt me-2"></i>
+                                Multi-LLM Evaluation
+                            </h6>
+                            <p class="small text-muted">
+                                Test safety responses across 8 different LLM models for comprehensive evaluation.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Ethical Guidelines -->
+    <div class="row mb-5">
+        <div class="col-lg-10 mx-auto">
+            <div class="card border-warning">
+                <div class="card-header bg-warning">
+                    <h3 class="card-title mb-0 text-dark">
+                        <i class="fas fa-balance-scale me-2"></i>
+                        Ethical Guidelines & Responsible Use
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-danger mb-4" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-exclamation-triangle me-2"></i>
+                            Mandatory Ethical Compliance
+                        </h6>
+                        <p class="mb-0">
+                            This platform is designed exclusively for educational and research purposes. Any misuse for malicious 
+                            activities is strictly prohibited and may result in legal consequences.
+                        </p>
+                    </div>
+
+                    <h6 class="text-primary mb-3">Research Guidelines</h6>
+                    <ul>
+                        <li class="mb-2">
+                            <strong>Educational Purpose Only:</strong> Use solely for understanding LLM vulnerabilities and improving safety measures.
+                        </li>
+                        <li class="mb-2">
+                            <strong>No Malicious Application:</strong> Never use generated jailbreaks to actually compromise or harm AI systems.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Responsible Disclosure:</strong> Share findings with appropriate stakeholders to improve overall AI safety.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Data Privacy:</strong> Respect privacy and confidentiality when working with sensitive domain knowledge.
+                        </li>
+                        <li class="mb-2">
+                            <strong>Collaborative Research:</strong> Use findings to contribute to the broader AI safety research community.
+                        </li>
+                    </ul>
+
+                    <h6 class="text-primary mt-4 mb-3">Technical Safeguards</h6>
+                    <ul>
+                        <li class="mb-2">All activities are logged for research purposes and safety monitoring</li>
+                        <li class="mb-2">Generated content includes clear warnings about research-only usage</li>
+                        <li class="mb-2">Platform includes built-in ethical guidelines and usage restrictions</li>
+                        <li class="mb-2">Regular safety reviews ensure platform is used appropriately</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research Citation -->
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-quote-left me-2"></i>
+                        Research Citation
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="bg-secondary p-4 rounded">
+                        <h6 class="text-primary mb-3">Paper Reference</h6>
+                        <p class="mb-2">
+                            <strong>Title:</strong> Knowledge-to-Jailbreak: One Knowledge Point Worth One Attack
+                        </p>
+                        <p class="mb-2">
+                            <strong>Authors:</strong> Shangqing Tu, Zhuoran Pan, Wenxuan Wang, Zhexin Zhang, Yuliang Sun, Jifan Yu, Hongning Wang, Lei Hou, Juanzi Li
+                        </p>
+                        <p class="mb-2">
+                            <strong>Institutions:</strong> Tsinghua University, Beihang University, The Chinese University of Hong Kong
+                        </p>
+                        <p class="mb-2">
+                            <strong>Year:</strong> 2024
+                        </p>
+                        <p class="mb-0">
+                            <strong>Repository:</strong> 
+                            <a href="https://github.com/THU-KEG/Knowledge-to-Jailbreak/" target="_blank" class="text-primary">
+                                https://github.com/THU-KEG/Knowledge-to-Jailbreak/
+                                <i class="fas fa-external-link-alt ms-1"></i>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

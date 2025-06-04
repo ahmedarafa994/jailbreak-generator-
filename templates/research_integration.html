@@ -1,0 +1,470 @@
+{% extends "base.html" %}
+
+{% block title %}Research Integration - Knowledge-to-Jailbreak Research Platform{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-lg-10 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title mb-0">
+                        <i class="fas fa-graduation-cap me-2"></i>
+                        Research Paper Integration
+                    </h3>
+                    <p class="text-muted mb-0">Automatically extract and integrate research insights into the platform</p>
+                </div>
+                <div class="card-body">
+                    <!-- Safety Notice -->
+                    <div class="alert alert-info mb-4" role="alert">
+                        <h6 class="alert-heading">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Research Integration Notice
+                        </h6>
+                        <p class="mb-0">
+                            This feature automatically extracts methodologies, techniques, and insights from research papers
+                            to enhance the platform's capabilities for AI safety research.
+                        </p>
+                    </div>
+
+                    <!-- Input Method Selection -->
+                    <div class="mb-4">
+                        <label class="form-label">
+                            <i class="fas fa-upload me-2"></i>
+                            Paper Input Method
+                        </label>
+                        <div class="btn-group w-100" role="group">
+                            <input type="radio" class="btn-check" name="input_method" id="url_method" value="url" checked>
+                            <label class="btn btn-outline-primary" for="url_method">
+                                <i class="fas fa-link me-2"></i>arXiv URL
+                            </label>
+                            
+                            <input type="radio" class="btn-check" name="input_method" id="file_method" value="file">
+                            <label class="btn btn-outline-primary" for="file_method">
+                                <i class="fas fa-file-pdf me-2"></i>Upload PDF
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Paper URL Input -->
+                    <div class="mb-4" id="url_input">
+                        <label for="paper_url" class="form-label">
+                            <i class="fas fa-link me-2"></i>
+                            Research Paper URL <span class="text-danger">*</span>
+                        </label>
+                        <input type="url" class="form-control" id="paper_url" 
+                               placeholder="https://arxiv.org/html/2502.15806v1 or arXiv ID: 2312.04403">
+                        <div class="form-text">
+                            Enter arXiv URL or just the paper ID (e.g., 2312.04403). Supports HTML and PDF formats.
+                        </div>
+                    </div>
+
+                    <!-- PDF File Upload -->
+                    <div class="mb-4" id="file_input" style="display: none;">
+                        <label for="paper_file" class="form-label">
+                            <i class="fas fa-file-pdf me-2"></i>
+                            Upload Research Paper PDF <span class="text-danger">*</span>
+                        </label>
+                        <input type="file" class="form-control" id="paper_file" accept=".pdf">
+                        <div class="form-text">
+                            Upload a PDF file of the research paper you want to analyze and integrate.
+                        </div>
+                    </div>
+
+                    <!-- Integration Options -->
+                    <div class="mb-4">
+                        <h5 class="mb-3">
+                            <i class="fas fa-cogs me-2"></i>
+                            Integration Options
+                        </h5>
+                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="extract_methodologies" checked>
+                                    <label class="form-check-label" for="extract_methodologies">
+                                        Extract Attack Methodologies
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="extract_frameworks" checked>
+                                    <label class="form-check-label" for="extract_frameworks">
+                                        Identify Technical Frameworks
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="extract_metrics" checked>
+                                    <label class="form-check-label" for="extract_metrics">
+                                        Enhanced Evaluation Metrics
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="extract_defenses" checked>
+                                    <label class="form-check-label" for="extract_defenses">
+                                        Safety Defense Strategies
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="generate_strategies" checked>
+                                    <label class="form-check-label" for="generate_strategies">
+                                        Generate New Attack Strategies
+                                    </label>
+                                </div>
+                                <div class="form-check mb-2">
+                                    <input class="form-check-input" type="checkbox" id="store_knowledge" checked>
+                                    <label class="form-check-label" for="store_knowledge">
+                                        Store in Knowledge Base
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Integration Button -->
+                    <div class="d-grid">
+                        <button type="button" class="btn btn-primary btn-lg" id="integrateBtn">
+                            <i class="fas fa-download me-2"></i>
+                            Extract & Integrate Research
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integration Results -->
+            <div class="card mt-4" id="integrationResults" style="display: none;">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Integration Results
+                    </h5>
+                </div>
+                <div class="card-body" id="integrationContent">
+                    <!-- Results will be populated here -->
+                </div>
+            </div>
+
+            <!-- Quick Integration for Current Paper -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-bolt me-2"></i>
+                        Quick Integration
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Quickly integrate the research paper you shared: 
+                        <code>https://arxiv.org/html/2502.15806v1</code>
+                    </p>
+                    <button type="button" class="btn btn-success" id="quickIntegrateBtn">
+                        <i class="fas fa-magic me-2"></i>
+                        Quick Integrate Current Paper
+                    </button>
+                </div>
+            </div>
+
+            <!-- Research Techniques Export -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-download me-2"></i>
+                        One-Click Research Technique Export
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted mb-3">
+                        Export all extracted research techniques from the database in your preferred format.
+                    </p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-success w-100" onclick="exportTechniques('json')">
+                                <i class="fas fa-code me-2"></i>
+                                Export as JSON
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-info w-100" onclick="exportTechniques('csv')">
+                                <i class="fas fa-table me-2"></i>
+                                Export as CSV
+                            </button>
+                        </div>
+                        <div class="col-md-4">
+                            <button class="btn btn-outline-primary w-100" onclick="exportTechniques('markdown')">
+                                <i class="fas fa-file-alt me-2"></i>
+                                Export as Markdown
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="export_status" class="mt-3" style="display: none;">
+                        <div class="alert alert-info">
+                            <i class="fas fa-download me-2"></i>
+                            <span id="export_message">Preparing export...</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Integration History -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-history me-2"></i>
+                        Recent Integrations
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div id="integrationHistory">
+                        <p class="text-muted">No recent integrations. Start by integrating a research paper above.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const integrateBtn = document.getElementById('integrateBtn');
+    const quickIntegrateBtn = document.getElementById('quickIntegrateBtn');
+    const paperUrlInput = document.getElementById('paper_url');
+    const integrationResults = document.getElementById('integrationResults');
+    const integrationContent = document.getElementById('integrationContent');
+    
+    // Handle input method switching
+    const urlMethodRadio = document.getElementById('url_method');
+    const fileMethodRadio = document.getElementById('file_method');
+    const urlInput = document.getElementById('url_input');
+    const fileInput = document.getElementById('file_input');
+    
+    urlMethodRadio.addEventListener('change', function() {
+        if (this.checked) {
+            urlInput.style.display = 'block';
+            fileInput.style.display = 'none';
+        }
+    });
+    
+    fileMethodRadio.addEventListener('change', function() {
+        if (this.checked) {
+            urlInput.style.display = 'none';
+            fileInput.style.display = 'block';
+        }
+    });
+
+    // Handle regular integration
+    integrateBtn.addEventListener('click', function() {
+        const inputMethod = document.querySelector('input[name="input_method"]:checked').value;
+        
+        if (inputMethod === 'url') {
+            const paperUrl = paperUrlInput.value.trim();
+            if (!paperUrl) {
+                alert('Please enter a research paper URL or arXiv ID');
+                return;
+            }
+            integrateResearchPaper(paperUrl, 'url');
+        } else {
+            const paperFile = document.getElementById('paper_file').files[0];
+            if (!paperFile) {
+                alert('Please select a PDF file to upload');
+                return;
+            }
+            integrateResearchPaper(paperFile, 'file');
+        }
+    });
+
+    // Handle quick integration
+    if (quickIntegrateBtn) {
+        quickIntegrateBtn.addEventListener('click', function() {
+            const paperUrl = 'https://arxiv.org/html/2502.15806v1';
+            integrateResearchPaper(paperUrl, 'url');
+        });
+    }
+
+    function integrateResearchPaper(source, method) {
+        // Show loading state
+        const activeBtn = (typeof source === 'string' && source.includes('2502.15806v1')) ? quickIntegrateBtn : integrateBtn;
+        const originalText = activeBtn.innerHTML;
+        activeBtn.disabled = true;
+        activeBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Processing...';
+        
+        let requestPromise;
+        
+        if (method === 'file') {
+            // Handle file upload
+            const formData = new FormData();
+            formData.append('paper_file', source);
+            
+            requestPromise = fetch('/api/upload-research-paper', {
+                method: 'POST',
+                body: formData
+            });
+        } else {
+            // Handle URL/arXiv ID
+            let arxivId = source;
+            const arxivMatch = source.match(/arxiv\.org\/(?:html|pdf)\/(\d{4}\.\d{5})/);
+            if (arxivMatch) {
+                arxivId = arxivMatch[1];
+            }
+            
+            requestPromise = fetch('/api/process-research-paper', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    source: arxivId,
+                    source_type: 'arxiv_id'
+                })
+            });
+        }
+        
+        // Hide previous results
+        integrationResults.style.display = 'none';
+
+        requestPromise
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayIntegrationResults(data);
+                } else {
+                    throw new Error(data.error || 'Processing failed');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                integrationContent.innerHTML = `
+                    <div class="alert alert-danger">
+                        <h6 class="alert-heading">Processing Error</h6>
+                        <p class="mb-0">Failed to process research paper: ${error.message}</p>
+                    </div>
+                `;
+                integrationResults.style.display = 'block';
+            })
+            .finally(() => {
+                // Restore button state
+                activeBtn.disabled = false;
+                activeBtn.innerHTML = originalText;
+            });
+    }
+
+    function displayIntegrationResults(data) {
+        const paperData = data.paper_data || data;
+        const isActuallyIntegrated = data.status === 'integrated' && data.techniques_stored > 0;
+        
+        integrationContent.innerHTML = `
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-book me-2"></i>Paper Information</h6>
+                    <p><strong>Title:</strong> ${paperData.title || 'Unknown Title'}</p>
+                    <p><strong>Status:</strong> <span class="badge ${isActuallyIntegrated ? 'bg-success' : 'bg-warning'}">${isActuallyIntegrated ? 'Fully Integrated' : 'Processed Only'}</span></p>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-database me-2"></i>Database Integration</h6>
+                    <p><strong>Techniques Stored:</strong> ${data.techniques_stored || 0}</p>
+                    <p><strong>Research Paper ID:</strong> ${data.research_paper_id || 'Not stored'}</p>
+                </div>
+            </div>
+            
+            <hr>
+            
+            <div class="mb-3">
+                <h6><i class="fas fa-scroll me-2"></i>Abstract</h6>
+                <p class="text-muted">${paperData.abstract ? paperData.abstract.substring(0, 300) + '...' : 'No abstract available'}</p>
+            </div>
+            
+            <div class="mb-3">
+                <h6><i class="fas fa-tools me-2"></i>Extracted Techniques</h6>
+                <div class="row">
+                    ${(paperData.techniques || []).slice(0, 4).map(technique => `
+                        <div class="col-md-6 mb-2">
+                            <span class="badge bg-secondary">${(technique && typeof technique === 'string' ? technique : String(technique || '')).substring(0, 60)}...</span>
+                        </div>
+                    `).join('')}
+                </div>
+            </div>
+            
+            ${isActuallyIntegrated ? `
+                <div class="alert alert-success">
+                    <h6 class="alert-heading"><i class="fas fa-check-circle me-2"></i>True Integration Complete</h6>
+                    <p class="mb-2">Research techniques have been stored in the database and are now actively used by the jailbreak generation system.</p>
+                    <p class="mb-0"><strong>Next:</strong> When you generate jailbreaks, the platform will use these authentic research techniques instead of generic templates.</p>
+                </div>
+            ` : `
+                <div class="alert alert-warning">
+                    <h6 class="alert-heading"><i class="fas fa-exclamation-triangle me-2"></i>Processing Only</h6>
+                    <p class="mb-0">Research paper was analyzed but techniques were not integrated into the active generation system. This is display-only.</p>
+                </div>
+            `}
+        `;
+        
+        integrationResults.style.display = 'block';
+    }
+    
+    // Load integration status on page load (if function exists)
+    if (typeof loadIntegrationStatus === 'function') {
+        loadIntegrationStatus();
+    }
+});
+
+// Export Functions
+function exportTechniques(format) {
+    const exportStatus = document.getElementById('export_status');
+    const exportMessage = document.getElementById('export_message');
+    
+    // Show loading state
+    exportStatus.style.display = 'block';
+    exportMessage.textContent = `Preparing ${format.toUpperCase()} export...`;
+    
+    // For CSV and Markdown, we trigger download directly
+    if (format === 'csv' || format === 'markdown') {
+        const link = document.createElement('a');
+        link.href = `/api/export-research-techniques?format=${format}`;
+        link.download = `research_techniques_${new Date().toISOString().slice(0,10)}.${format === 'markdown' ? 'md' : format}`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        setTimeout(() => {
+            exportStatus.style.display = 'none';
+        }, 2000);
+    } else {
+        // For JSON, fetch and display
+        fetch(`/api/export-research-techniques?format=${format}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    exportMessage.textContent = `${format.toUpperCase()} export ready! ${data.total_techniques} techniques exported.`;
+                    
+                    // Create download link for JSON
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = window.URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    link.href = url;
+                    link.download = `research_techniques_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
+                    window.URL.revokeObjectURL(url);
+                } else {
+                    exportMessage.textContent = `Export failed: ${data.error}`;
+                }
+                
+                setTimeout(() => {
+                    exportStatus.style.display = 'none';
+                }, 3000);
+            })
+            .catch(error => {
+                exportMessage.textContent = `Export error: ${error.message}`;
+                setTimeout(() => {
+                    exportStatus.style.display = 'none';
+                }, 3000);
+            });
+    }
+}
+</script>
+{% endblock %}
