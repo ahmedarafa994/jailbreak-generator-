@@ -1,7 +1,4 @@
-openai
-anthropic
+secrets
 torch
-google-generativeai
-urllib3
-fastchat
-vllm
+transformers
+openai
