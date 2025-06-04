@@ -1,29 +1,29 @@
 from app import app, db
 from flask import render_template, request, redirect, url_for, flash, jsonify, make_response
 from models import KnowledgeEntry, JailbreakAttempt, SafetyEvaluation, ResearchPaper, ExtractedTechnique
-from utils.knowledge_processor import process_knowledge
-from utils.jailbreak_generator import generate_jailbreak
+from easyjailbreak.utils.knowledge_processor import process_knowledge
+from easyjailbreak.utils.jailbreak_generator import generate_jailbreak
 # Assuming these specific framework integrations are still relevant for other parts or future use.
 # If they are only for the very complex /api/test-processing that was removed/simplified, some might be unused.
-from utils.transferattack_integration import generate_transferattack_framework_jailbreak
-from utils.igcg_integration import generate_igcg_framework_jailbreak
-from utils.footindoor_integration import generate_footindoor_framework_jailbreak
-from utils.knowledge_enhancement_engine import enhance_knowledge_with_ai_prompting
-from utils.sqlinjection_integration import generate_sqlinjection_framework_jailbreak
-from utils.hyde_integration import generate_hyde_framework_jailbreak
-from utils.complete_autodan_strategies import autodan_strategist, get_available_autodan_strategies, get_strategy_categories
-from utils.overthink_integration import generate_overthink_autodan_jailbreak, overthink_integrator
-from utils.bot_integration import generate_triple_framework_jailbreak, bot_integrator
-from utils.flipattack_integration import generate_quad_framework_jailbreak, flipattack_integrator
-from utils.tap_integration import generate_tap_framework_jailbreak
-from utils.gptfuzz_integration import generate_gptfuzz_framework_jailbreak
-from utils.pif_transferable_attacks import generate_pif_transferable_jailbreak
-from utils.adversarial_triggers import generate_adversarial_trigger_jailbreak
-from utils.chain_iterative_chaos import generate_chain_iterative_chaos_jailbreak
-from utils.pathseeker_framework import generate_pathseeker_jailbreak
-from utils.adversarial_self_replicating import generate_adversarial_self_replicating_jailbreak
-from utils.jailbreakv_28k_framework import generate_jailbreakv_28k_jailbreak
-from utils.jailbreakv_mllm_framework import generate_jailbreakv_mllm_jailbreak
+from easyjailbreak.utils.transferattack_integration import generate_transferattack_framework_jailbreak
+from easyjailbreak.utils.igcg_integration import generate_igcg_framework_jailbreak
+from easyjailbreak.utils.footindoor_integration import generate_footindoor_framework_jailbreak
+from easyjailbreak.utils.knowledge_enhancement_engine import enhance_knowledge_with_ai_prompting
+from easyjailbreak.utils.sqlinjection_integration import generate_sqlinjection_framework_jailbreak
+from easyjailbreak.utils.hyde_integration import generate_hyde_framework_jailbreak
+from easyjailbreak.utils.complete_autodan_strategies import autodan_strategist, get_available_autodan_strategies, get_strategy_categories
+from easyjailbreak.utils.overthink_integration import generate_overthink_autodan_jailbreak, overthink_integrator
+from easyjailbreak.utils.bot_integration import generate_triple_framework_jailbreak, bot_integrator
+from easyjailbreak.utils.flipattack_integration import generate_quad_framework_jailbreak, flipattack_integrator
+from easyjailbreak.utils.tap_integration import generate_tap_framework_jailbreak
+from easyjailbreak.utils.gptfuzz_integration import generate_gptfuzz_framework_jailbreak
+from easyjailbreak.utils.pif_transferable_attacks import generate_pif_transferable_jailbreak
+from easyjailbreak.utils.adversarial_triggers import generate_adversarial_trigger_jailbreak
+from easyjailbreak.utils.chain_iterative_chaos import generate_chain_iterative_chaos_jailbreak
+from easyjailbreak.utils.pathseeker_framework import generate_pathseeker_jailbreak
+from easyjailbreak.utils.adversarial_self_replicating import generate_adversarial_self_replicating_jailbreak
+from easyjailbreak.utils.jailbreakv_28k_framework import generate_jailbreakv_28k_jailbreak
+from easyjailbreak.utils.jailbreakv_mllm_framework import generate_jailbreakv_mllm_jailbreak
 
 import logging
 from datetime import datetime # Added missing import
@@ -146,7 +146,7 @@ def knowledge_input():
             app.logger.info(f"Knowledge entry created with ID: {knowledge_entry.id}")
 
             try:
-                from utils.comprehensive_technique_integration import generate_comprehensive_research_prompt, initialize_comprehensive_integration
+                from easyjailbreak.utils.comprehensive_technique_integration import generate_comprehensive_research_prompt, initialize_comprehensive_integration
                 initialize_comprehensive_integration()
 
                 jailbreak_result = generate_comprehensive_research_prompt(
@@ -188,7 +188,7 @@ def generate_jailbreak_view(knowledge_id):
     """Generate jailbreak from knowledge entry"""
     knowledge_entry = KnowledgeEntry.query.get_or_404(knowledge_id)
     try:
-        from utils.research_enhanced_generator import research_enhanced_generator
+        from easyjailbreak.utils.research_enhanced_generator import research_enhanced_generator
         available_techniques_count = ExtractedTechnique.query.filter_by(is_active=True).count()
 
         if available_techniques_count > 0:
@@ -196,7 +196,7 @@ def generate_jailbreak_view(knowledge_id):
                 knowledge_entry.knowledge_text, knowledge_entry.domain
             )
         else:
-            from utils.complete_autodan_strategies import generate_autodan_jailbreak
+            from easyjailbreak.utils.complete_autodan_strategies import generate_autodan_jailbreak
             jailbreak_result = generate_autodan_jailbreak(knowledge_entry.knowledge_text, knowledge_entry.domain)
 
         jailbreak_attempt = JailbreakAttempt(
@@ -299,7 +299,7 @@ def safety_evaluation():
             automated_assessment = None
             if llm_response: # Only run if response is provided
                 try:
-                    from utils.automated_safety_evaluator import automated_evaluator
+                    from easyjailbreak.utils.automated_safety_evaluator import automated_evaluator
                     automated_assessment = automated_evaluator.evaluate_jailbreak_response(
                         jailbreak_attempt.generated_jailbreak, llm_response, target_llm
                     )
@@ -430,7 +430,7 @@ def diagnostic():
         frameworks_status_summary['autodan'] = {'status': 'error', 'details': str(e)}
 
     try:
-        from utils.overthink_integration import overthink_integrator # Test import
+        from easyjailbreak.utils.overthink_integration import overthink_integrator # Test import
         # Could add a simple test call if overthink_integrator has a status or test method
         frameworks_status_summary['overthink'] = {'status': 'available', 'details': 'Integrator loaded.'}
     except Exception as e:
@@ -534,14 +534,14 @@ def integration_demo():
 
         frameworks_status_summary = {}
         try:
-            from utils.comprehensive_technique_integration import get_integration_status
+            from easyjailbreak.utils.comprehensive_technique_integration import get_integration_status
             frameworks_status_summary['comprehensive'] = get_integration_status()
         except Exception as e:
             frameworks_status_summary['comprehensive'] = {'status': 'error', 'details': str(e)}
 
         framework_modules_to_test = [
-            ('autodan', 'utils.complete_autodan_strategies'), ('overthink', 'utils.overthink_integration'),
-            ('bot', 'utils.bot_integration'), ('flipattack', 'utils.flipattack_integration')
+            ('autodan', 'easyjailbreak.utils.complete_autodan_strategies'), ('overthink', 'easyjailbreak.utils.overthink_integration'),
+            ('bot', 'easyjailbreak.utils.bot_integration'), ('flipattack', 'easyjailbreak.utils.flipattack_integration')
         ]
         for name, path in framework_modules_to_test:
             try:
@@ -896,9 +896,9 @@ def api_run_diagnostics_action(): # Renamed function
 
         # Framework Module Availability Check
         framework_modules = {
-            'autodan': 'utils.complete_autodan_strategies', 'overthink': 'utils.overthink_integration',
-            'comprehensive_integration': 'utils.comprehensive_technique_integration',
-            'automated_safety_evaluator': 'utils.automated_safety_evaluator',
+            'autodan': 'easyjailbreak.utils.complete_autodan_strategies', 'overthink': 'easyjailbreak.utils.overthink_integration',
+            'comprehensive_integration': 'easyjailbreak.utils.comprehensive_technique_integration',
+            'automated_safety_evaluator': 'easyjailbreak.utils.automated_safety_evaluator',
             'pdf_extractor': 'pdf_research_extractor', # Example, adjust as needed
             'paper_technique_extractor': 'extract_paper_techniques' # Example
         }
@@ -940,7 +940,7 @@ def api_verify_technique_integration_action(): # Renamed function
 
         # 2. Code-Level Integration (Module/Function Availability)
         try:
-            from utils.comprehensive_technique_integration import verify_technique_availability # Assumed utility
+            from easyjailbreak.utils.comprehensive_technique_integration import verify_technique_availability # Assumed utility
             code_integ_status = verify_technique_availability() # Expects dict
             verification_summary['steps']['code_module_check'] = code_integ_status
         except ImportError:
@@ -955,7 +955,7 @@ def api_verify_technique_integration_action(): # Renamed function
             test_domain_val = SUPPORTED_DOMAINS[0]
 
         try:
-            from utils.comprehensive_technique_integration import test_technique_integration # Assumed utility
+            from easyjailbreak.utils.comprehensive_technique_integration import test_technique_integration # Assumed utility
             functional_test_result = test_technique_integration(test_objective_val, test_domain_val) # Expects dict
             verification_summary['steps']['functional_prompt_test'] = functional_test_result
         except ImportError:

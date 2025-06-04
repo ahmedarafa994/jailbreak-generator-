@@ -1,5 +1,5 @@
-from framework import Attacker, Scorer, Summarizer, Retrieval, Target
-from llm import HuggingFaceModel, OpenAIEmbeddingModel
+from easyjailbreak.framework import Attacker, Scorer, Summarizer, Retrieval, Target
+from easyjailbreak.llm import HuggingFaceModel, OpenAIEmbeddingModel
 import argparse
 import logging
 import os

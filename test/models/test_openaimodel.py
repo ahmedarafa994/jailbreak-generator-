@@ -12,7 +12,7 @@ class TestOpenaiModel(unittest.TestCase):
         self.mock_client = MagicMock()
         self.openai_model = OpenaiModel(self.model_name, self.api_key)
 
-    @patch('your_module.OpenAI')
+    @patch('openai.OpenAI')
     def test_init(self, mock_openai):
         # Test initialization
         mock_openai.assert_called_with(api_key=self.api_key)
@@ -24,7 +24,7 @@ class TestOpenaiModel(unittest.TestCase):
         self.openai_model.set_system_message(system_message)
         self.assertEqual(self.openai_model.conversation.system_message, system_message)
 
-    @patch('your_module.OpenAI')
+    @patch('openai.OpenAI')
     def test_generate(self, mock_openai):
         # Test generating a response
         message = "Test message"
@@ -32,7 +32,7 @@ class TestOpenaiModel(unittest.TestCase):
         response = self.openai_model.generate(message)
         self.assertEqual(response, "Response")
 
-    @patch('your_module.OpenAI')
+    @patch('openai.OpenAI')
     def test_batch_generate(self, mock_openai):
         # Test batch generation
         conversations = [["Message 1"], ["Message 2"]]
